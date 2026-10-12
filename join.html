@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to Join – Project Blackout PVP</title>
+  <meta name="description" content="Step-by-step guide to joining the Project Blackout PVP DayZ server, plus tips for your first hour and troubleshooting.">
+  <meta name="theme-color" content="#050407">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="How to Join – Project Blackout PVP">
+  <meta property="og:description" content="Step-by-step guide to joining the Project Blackout PVP DayZ server, plus tips for your first hour and troubleshooting.">
+  <meta property="og:image" content="assets/img/fortress.webp">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/fonts.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body class="page-join">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ============ NAVIGATION ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a class="brand" href="index.html" aria-label="Project Blackout PVP – home">
+        <img class="brand__logo" src="assets/img/logo.svg" alt="" width="38" height="38">
+        <span class="brand__text">
+          <span class="brand__small">Project</span>
+          <span class="brand__big">Blackout</span>
+        </span>
+        <span class="tag">PVP</span>
+      </a>
+
+      <nav class="nav__menu" id="nav-menu" aria-label="Main navigation">
+        <a class="nav__link" href="index.html">Home</a>
+        <a class="nav__link" href="server.html">Server</a>
+        <a class="nav__link" href="rules.html">Rules</a>
+        <a class="nav__link" href="join.html" aria-current="page">Join</a>
+        <a class="nav__link" href="faq.html">FAQ</a>
+        <a class="nav__link" href="team.html">Team</a>
+        <a class="nav__link" href="support.html">Support</a>
+        <a class="btn btn--primary btn--sm nav__cta" href="#" data-cfg-href="discord" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
+          Discord
+        </a>
+      </nav>
+
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-hero page-hero--crate">
+      <div class="page-hero__bg" aria-hidden="true"></div>
+      <div class="container page-hero__content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="index.html">Home</a><span aria-hidden="true">/</span><span aria-current="page">How to join</span>
+        </nav>
+        <h1 class="page-hero__title">How to <span class="accent">join</span></h1>
+        <p class="page-hero__intro">From the launcher to your first firefight: everything you need to get onto Project Blackout PVP – plus fixes for the most common connection problems.</p>
+      </div>
+    </section>
+
+    <!-- ============ QUICK CONNECT ============ -->
+    <section class="section section--tight">
+      <div class="container">
+        <div class="connect reveal">
+          <div class="connect__main">
+            <p class="eyebrow">Quick connect</p>
+            <h2 class="connect__title">Server address</h2>
+            <button class="ip ip--lg" type="button" data-copy-ip title="Copy IP">
+              <span class="ip__text" data-cfg="address">–</span>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>
+              <span class="sr-only">copy</span>
+            </button>
+          </div>
+          <dl class="connect__facts">
+            <div data-requires="battlemetricsId" hidden>
+              <dt>Status</dt>
+              <dd><span class="dot" data-status-dot></span> <span data-status-text>Checking …</span></dd>
+            </div>
+            <div><dt data-players-label>Slots</dt><dd class="mono" data-players>–</dd></div>
+            <div><dt>Map</dt><dd data-cfg="map">–</dd></div>
+            <div data-requires="restartTimes" hidden><dt>Next restart</dt><dd class="mono" data-restart-countdown>--:--:--</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ REQUIREMENTS ============ -->
+    <section class="section section--tight section--flush-top">
+      <div class="container">
+        <header class="section__head section__head--left reveal">
+          <p class="eyebrow">// 01 — Before you start</p>
+          <h2 class="h2">What you <span class="accent">need</span></h2>
+        </header>
+
+        <div class="features">
+          <div class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-download"/></svg></div>
+            <h3 class="card__title">DayZ on Steam</h3>
+            <p>A copy of DayZ in your Steam library, updated to the latest version.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg></div>
+            <h3 class="card__title">Our Discord</h3>
+            <p>Announcements, restarts, events and support all happen on Discord.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg></div>
+            <h3 class="card__title">The rules</h3>
+            <p>Read the <a href="rules.html">rulebook</a> before you play – it's short and it saves you a ban.</p>
+          </div>
+        </div>
+
+        <div class="mods reveal" data-requires="mods" hidden>
+          <h3 class="mods__title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-package"/></svg> Required mods</h3>
+          <p>The launcher downloads these automatically. If something goes wrong, you can subscribe to them manually in the Steam Workshop.</p>
+          <ul class="mods__list" data-mods-list></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAUNCHER GUIDE ============ -->
+    <section class="section section--alt">
+      <div class="container">
+        <header class="section__head section__head--left reveal">
+          <p class="eyebrow">// 02 — Step by step</p>
+          <h2 class="h2">Connect to the <span class="accent">server</span></h2>
+          <p class="section__sub">Pick your launcher. If the server uses mods, the DZSA Launcher is the easiest way – it downloads and loads everything for you.</p>
+        </header>
+
+        <div class="tabs reveal" data-tabs>
+          <div class="tabs__list" role="tablist" aria-label="Launcher">
+            <button class="tabs__tab" type="button" role="tab" id="tab-official" aria-controls="panel-official" aria-selected="true">DayZ Launcher</button>
+            <button class="tabs__tab" type="button" role="tab" id="tab-dzsa" aria-controls="panel-dzsa" aria-selected="false">DZSA Launcher</button>
+          </div>
+
+          <div class="tabs__panel" role="tabpanel" id="panel-official" aria-labelledby="tab-official" tabindex="0">
+            <ol class="guide">
+              <li>
+                <h3>Start DayZ</h3>
+                <p>Launch DayZ through Steam. The official DayZ Launcher opens.</p>
+              </li>
+              <li>
+                <h3>Open the server browser</h3>
+                <p>Go to <span class="ui">Servers</span> and select the <span class="ui">Community</span> tab.</p>
+              </li>
+              <li>
+                <h3>Find Project Blackout</h3>
+                <p>Type <span class="ui">Project Blackout</span> into the search field. Can't find it? Use <span class="ui">Direct connect</span> and enter <button class="ip ip--inline" type="button" data-copy-ip title="Copy IP"><span class="ip__text" data-cfg="address">–</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg></button></p>
+              </li>
+              <li>
+                <h3>Download mods (if required)</h3>
+                <p>If the server needs mods, the launcher offers to subscribe to them in the Steam Workshop. Wait until all downloads are finished.</p>
+              </li>
+              <li>
+                <h3>Join</h3>
+                <p>Click <span class="ui">Play</span> – see you on the coast.</p>
+              </li>
+            </ol>
+          </div>
+
+          <div class="tabs__panel" role="tabpanel" id="panel-dzsa" aria-labelledby="tab-dzsa" tabindex="0">
+            <ol class="guide">
+              <li>
+                <h3>Install the DZSA Launcher</h3>
+                <p>Download it for free from <a href="https://dayzsalauncher.com" target="_blank" rel="noopener">dayzsalauncher.com</a> and install it.</p>
+              </li>
+              <li>
+                <h3>Start the launcher</h3>
+                <p>It finds your DayZ installation automatically. Make sure Steam is running.</p>
+              </li>
+              <li>
+                <h3>Search for the server</h3>
+                <p>Enter <span class="ui">Project Blackout</span> in the search bar of the server list.</p>
+              </li>
+              <li>
+                <h3>Play</h3>
+                <p>Click <span class="ui">Play</span>. Missing mods are downloaded and loaded automatically – the first start can take a few minutes.</p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FIRST HOUR ============ -->
+    <section class="section">
+      <div class="container">
+        <header class="section__head reveal">
+          <p class="eyebrow">// 03 — Survival basics</p>
+          <h2 class="h2">Your first <span class="accent">hour</span></h2>
+          <p class="section__sub">New to DayZ or to hardcore PvP? These habits keep you alive longer.</p>
+        </header>
+
+        <div class="features features--compact">
+          <article class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-droplet"/></svg></div>
+            <h3 class="card__title">Water &amp; food first</h3>
+            <p>Wells, ponds and canned food in houses keep you going. Don't drink from dirty water without boiling it.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-knife"/></svg></div>
+            <h3 class="card__title">Grab a melee weapon</h3>
+            <p>An axe or a pipe wrench beats bare fists against infected – and against other fresh spawns.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-compass"/></svg></div>
+            <h3 class="card__title">Move inland</h3>
+            <p>The coast is crowded. Head inland, avoid open fields and use tree lines for cover.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg></div>
+            <h3 class="card__title">Light discipline</h3>
+            <p>At night, every flashlight and chemlight gives away your position. Use them only when you have to.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg></div>
+            <h3 class="card__title">Check before you loot</h3>
+            <p>Stop, listen and scan before entering a town. Open doors and gunshots mean someone was here.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg></div>
+            <h3 class="card__title">Find a squad</h3>
+            <p>Lone wolves die fast. Look for teammates on our Discord.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TROUBLESHOOTING ============ -->
+    <section class="section section--alt" id="troubleshooting">
+      <div class="container container--narrow">
+        <header class="section__head reveal">
+          <p class="eyebrow">// 04 — Troubleshooting</p>
+          <h2 class="h2">Can't <span class="accent">connect?</span></h2>
+          <p class="section__sub">The most common problems and how to fix them.</p>
+        </header>
+
+        <div class="acc-list">
+          <details class="acc reveal">
+            <summary>The server doesn't show up in the list</summary>
+            <div class="acc__body">
+              <p>Clear all filters in the server browser (ping, version, “show full servers”) and search again. If it still doesn't appear, use <strong>Direct connect</strong> with the server IP. The server might also be restarting – check the <a href="server.html#restarts">restart schedule</a>.</p>
+            </div>
+          </details>
+          <details class="acc reveal">
+            <summary>“Missing mods” or mod mismatch</summary>
+            <div class="acc__body">
+              <p>Use the DZSA Launcher, or let the official launcher download the mods. If the error persists, unsubscribe from the affected mod in the Steam Workshop, subscribe again and wait until Steam has finished downloading.</p>
+            </div>
+          </details>
+          <details class="acc reveal">
+            <summary>Kicked by BattlEye</summary>
+            <div class="acc__body">
+              <p>Restart Steam and DayZ. If that doesn't help, verify your game files: <span class="ui">Steam → DayZ → Properties → Installed Files → Verify integrity of game files</span>. This also repairs BattlEye. Close overlay or macro software that BattlEye might flag.</p>
+            </div>
+          </details>
+          <details class="acc reveal">
+            <summary>Version mismatch</summary>
+            <div class="acc__body">
+              <p>Update DayZ through Steam. After big game updates the server may need some time to update too – watch Discord for announcements.</p>
+            </div>
+          </details>
+          <details class="acc reveal">
+            <summary>Stuck on the loading screen</summary>
+            <div class="acc__body">
+              <p>Verify your game files and give it a moment – the first join after a restart takes longer. Installing DayZ on an SSD speeds up loading considerably.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout--soft reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-help"/></svg>
+          <div>
+            <p><strong>Still stuck?</strong> Check the <a href="faq.html">FAQ</a> or <a href="support.html">open a support ticket</a> – we'll help you get in.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="index.html" aria-label="Project Blackout PVP – home">
+          <img class="brand__logo" src="assets/img/logo.svg" alt="" width="38" height="38">
+          <span class="brand__text">
+            <span class="brand__small">Project</span>
+            <span class="brand__big">Blackout</span>
+          </span>
+          <span class="tag">PVP</span>
+        </a>
+        <p>Hardcore DayZ PvP server. When the lights go out, the hunt begins.</p>
+        <a class="btn btn--ghost btn--sm" href="#" data-cfg-href="discord" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
+          Join our Discord
+        </a>
+      </div>
+
+      <nav class="footer__col" aria-label="Server pages">
+        <h3 class="footer__title">Server</h3>
+        <a href="index.html">Home</a>
+        <a href="server.html">Server info</a>
+        <a href="rules.html">Rules</a>
+        <a href="join.html">How to join</a>
+      </nav>
+
+      <nav class="footer__col" aria-label="Help pages">
+        <h3 class="footer__title">Help</h3>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
+        <a href="support.html#appeal">Ban appeal</a>
+        <a href="team.html">Team</a>
+      </nav>
+
+      <div class="footer__col">
+        <h3 class="footer__title">Connect</h3>
+        <button class="ip ip--sm" type="button" data-copy-ip title="Copy IP">
+          <span class="ip__text" data-cfg="address">–</span>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>
+          <span class="sr-only">copy</span>
+        </button>
+        <span data-cfg="map">–</span>
+        <span data-requires="restartTimes" hidden>Next restart: <span class="mono" data-restart-next>–</span> <span data-restart-tz></span></span>
+      </div>
+    </div>
+
+    <div class="container footer__bottom">
+      <p>© <span data-year></span> Project Blackout PVP</p>
+      <p>DayZ is a trademark of Bohemia Interactive a.s. This server is not officially affiliated with Bohemia Interactive.</p>
+    </div>
+  </footer>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+
+  <!-- ============ ICONS ============ -->
+  <svg width="0" height="0" class="sr-only" aria-hidden="true">
+    <symbol id="i-discord" viewBox="0 0 24 24"><path fill="currentColor" d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.1.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="i-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4M21 5h-4"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></symbol>
+    <symbol id="i-droplet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></symbol>
+    <symbol id="i-knife" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6M16 16l4 4M19 21l2-2"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></symbol>
+  </svg>
+</body>
+</html>

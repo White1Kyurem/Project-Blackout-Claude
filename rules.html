@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rules – Project Blackout PVP</title>
+  <meta name="description" content="The complete rulebook of the Project Blackout PVP DayZ server: PvP, groups, base building, raiding, vehicles and penalties.">
+  <meta name="theme-color" content="#050407">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Rules – Project Blackout PVP">
+  <meta property="og:description" content="The complete rulebook of the Project Blackout PVP DayZ server: PvP, groups, base building, raiding, vehicles and penalties.">
+  <meta property="og:image" content="assets/img/fortress.webp">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/fonts.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body class="page-rules">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ============ NAVIGATION ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a class="brand" href="index.html" aria-label="Project Blackout PVP – home">
+        <img class="brand__logo" src="assets/img/logo.svg" alt="" width="38" height="38">
+        <span class="brand__text">
+          <span class="brand__small">Project</span>
+          <span class="brand__big">Blackout</span>
+        </span>
+        <span class="tag">PVP</span>
+      </a>
+
+      <nav class="nav__menu" id="nav-menu" aria-label="Main navigation">
+        <a class="nav__link" href="index.html">Home</a>
+        <a class="nav__link" href="server.html">Server</a>
+        <a class="nav__link" href="rules.html" aria-current="page">Rules</a>
+        <a class="nav__link" href="join.html">Join</a>
+        <a class="nav__link" href="faq.html">FAQ</a>
+        <a class="nav__link" href="team.html">Team</a>
+        <a class="nav__link" href="support.html">Support</a>
+        <a class="btn btn--primary btn--sm nav__cta" href="#" data-cfg-href="discord" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
+          Discord
+        </a>
+      </nav>
+
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-hero page-hero--fortress">
+      <div class="page-hero__bg" aria-hidden="true"></div>
+      <div class="container page-hero__content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="index.html">Home</a><span aria-hidden="true">/</span><span aria-current="page">Rules</span>
+        </nav>
+        <h1 class="page-hero__title">The <span class="accent">Rulebook</span></h1>
+        <p class="page-hero__intro">Hard fights need fair rules. By joining the server or our Discord, you accept everything on this page – not knowing a rule doesn't protect you from its penalty.</p>
+      </div>
+    </section>
+
+    <!-- Example rules: adapt the content, numbers and penalties to your server. -->
+    <section class="section section--tight">
+      <div class="container docs">
+        <aside class="docs__side">
+          <nav class="toc" data-toc aria-label="Rule sections">
+            <p class="toc__title">Contents</p>
+            <ol>
+              <li><a href="#general">1. General</a></li>
+              <li><a href="#communication">2. Communication</a></li>
+              <li><a href="#pvp">3. PvP &amp; Combat</a></li>
+              <li><a href="#groups">4. Groups &amp; Clans</a></li>
+              <li><a href="#building">5. Base Building</a></li>
+              <li><a href="#raiding">6. Raiding</a></li>
+              <li><a href="#vehicles">7. Vehicles</a></li>
+              <li><a href="#exploits">8. Cheats &amp; Exploits</a></li>
+              <li><a href="#staff">9. Staff &amp; Reports</a></li>
+              <li><a href="#penalties">10. Penalties</a></li>
+            </ol>
+          </nav>
+        </aside>
+
+        <div class="docs__main">
+          <div class="docs__toolbar">
+            <label class="search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg>
+              <span class="sr-only">Search the rules</span>
+              <input type="search" placeholder="Search rules … e.g. combat log, base, raid" data-filter="#rulebook" autocomplete="off">
+            </label>
+            <p class="docs__meta">Last updated: <time datetime="2026-10-12">12 Oct 2026</time></p>
+          </div>
+
+          <div class="callout">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg>
+            <div>
+              <p><strong>Staff may act against any behaviour that harms the server or its community</strong>, even if it isn't explicitly listed here.</p>
+              <p>Tip: click a rule number to copy a direct link to that rule.</p>
+            </div>
+          </div>
+
+          <div id="rulebook">
+            <!-- 1. GENERAL -->
+            <section class="rule-sec" id="general" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg></span>
+                <h2><span class="rule-sec__num">01</span> General</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r1-1" data-filter-item><a class="rule-item__num" href="#r1-1">1.1</a><p>Respect other players and staff. Trash talk about the game is fine – <strong>racism, sexism, threats and any form of discrimination are not</strong>, whether in-game, in voice chat or on Discord.</p></li>
+                <li class="rule-item" id="r1-2" data-filter-item><a class="rule-item__num" href="#r1-2">1.2</a><p>One account per player. Alt accounts used to scout, hold loot or evade a ban are prohibited.</p></li>
+                <li class="rule-item" id="r1-3" data-filter-item><a class="rule-item__num" href="#r1-3">1.3</a><p>Your in-game name must not be offensive and must not impersonate staff or other players.</p></li>
+                <li class="rule-item" id="r1-4" data-filter-item><a class="rule-item__num" href="#r1-4">1.4</a><p>Staff decisions are final in-game. If you disagree, open a ticket on Discord – don't argue in chat.</p></li>
+                <li class="rule-item" id="r1-5" data-filter-item><a class="rule-item__num" href="#r1-5">1.5</a><p>Lost gear is not refunded. Exceptions are only made for proven server-side issues with video evidence.</p></li>
+              </ol>
+            </section>
+
+            <!-- 2. COMMUNICATION -->
+            <section class="rule-sec" id="communication" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chat"/></svg></span>
+                <h2><span class="rule-sec__num">02</span> Communication</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r2-1" data-filter-item><a class="rule-item__num" href="#r2-1">2.1</a><p>No spam, advertising or links to other servers in text chat or on Discord.</p></li>
+                <li class="rule-item" id="r2-2" data-filter-item><a class="rule-item__num" href="#r2-2">2.2</a><p>Hate speech and real-life threats result in an <strong>immediate permanent ban</strong>.</p></li>
+                <li class="rule-item" id="r2-3" data-filter-item><a class="rule-item__num" href="#r2-3">2.3</a><p>Never share other players' personal information (doxxing).</p></li>
+                <li class="rule-item" id="r2-4" data-filter-item><a class="rule-item__num" href="#r2-4">2.4</a><p>No soundboards or deliberately loud audio spam in proximity voice chat.</p></li>
+                <li class="rule-item" id="r2-5" data-filter-item><a class="rule-item__num" href="#r2-5">2.5</a><p>English is the main language in global text chat, so staff can moderate it.</p></li>
+              </ol>
+            </section>
+
+            <!-- 3. PVP -->
+            <section class="rule-sec" id="pvp" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-crosshair"/></svg></span>
+                <h2><span class="rule-sec__num">03</span> PvP &amp; Combat</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r3-1" data-filter-item><a class="rule-item__num" href="#r3-1">3.1</a><p><strong>Kill on sight (KOS) is allowed</strong> everywhere on the map.</p></li>
+                <li class="rule-item" id="r3-2" data-filter-item><a class="rule-item__num" href="#r3-2">3.2</a><p><strong>No combat logging.</strong> Don't log out during a fight or within 5 minutes after one to save your character. Alt+F4 and pulling your network cable count as combat logging.</p></li>
+                <li class="rule-item" id="r3-3" data-filter-item><a class="rule-item__num" href="#r3-3">3.3</a><p><strong>No ghosting.</strong> Don't relog or switch servers to gain a position on players you are fighting or raiding. Wait at least 15 minutes and log back in at least 500 m away.</p></li>
+                <li class="rule-item" id="r3-4" data-filter-item><a class="rule-item__num" href="#r3-4">3.4</a><p>No deliberate spawn camping – repeatedly killing fresh spawns at the coast is not allowed.</p></li>
+                <li class="rule-item" id="r3-5" data-filter-item><a class="rule-item__num" href="#r3-5">3.5</a><p>No stream sniping. Using a live stream to locate or ambush a player is prohibited.</p></li>
+              </ol>
+            </section>
+
+            <!-- 4. GROUPS -->
+            <section class="rule-sec" id="groups" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg></span>
+                <h2><span class="rule-sec__num">04</span> Groups &amp; Clans</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r4-1" data-filter-item><a class="rule-item__num" href="#r4-1">4.1</a><p>The <strong>maximum group size is 6 players</strong> – including anyone you actively cooperate with.</p></li>
+                <li class="rule-item" id="r4-2" data-filter-item><a class="rule-item__num" href="#r4-2">4.2</a><p>No teaming beyond the group limit. Alliances between groups are prohibited.</p></li>
+                <li class="rule-item" id="r4-3" data-filter-item><a class="rule-item__num" href="#r4-3">4.3</a><p>No rotating members to get around the limit. It applies at all times, not just per session.</p></li>
+                <li class="rule-item" id="r4-4" data-filter-item><a class="rule-item__num" href="#r4-4">4.4</a><p>Clan names and tags must not be offensive.</p></li>
+              </ol>
+            </section>
+
+            <!-- 5. BASE BUILDING -->
+            <section class="rule-sec" id="building" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wall"/></svg></span>
+                <h2><span class="rule-sec__num">05</span> Base Building</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r5-1" data-filter-item><a class="rule-item__num" href="#r5-1">5.1</a><p>No building within <strong>1,000 m of military zones, airfields or major cities</strong>.</p></li>
+                <li class="rule-item" id="r5-2" data-filter-item><a class="rule-item__num" href="#r5-2">5.2</a><p>No building within 500 m of airdrop locations, event zones or player spawns.</p></li>
+                <li class="rule-item" id="r5-3" data-filter-item><a class="rule-item__num" href="#r5-3">5.3</a><p><strong>No glitch bases.</strong> Walls, gates or containers inside rocks, trees, terrain or map buildings are not allowed.</p></li>
+                <li class="rule-item" id="r5-4" data-filter-item><a class="rule-item__num" href="#r5-4">5.4</a><p>Every base must be accessible and raidable by legit means.</p></li>
+                <li class="rule-item" id="r5-5" data-filter-item><a class="rule-item__num" href="#r5-5">5.5</a><p>Don't block roads, bridges, loot spawns or the entrances of map buildings.</p></li>
+                <li class="rule-item" id="r5-6" data-filter-item><a class="rule-item__num" href="#r5-6">5.6</a><p>One main base per group. Bases that break these rules can be removed without warning.</p></li>
+              </ol>
+            </section>
+
+            <!-- 6. RAIDING -->
+            <section class="rule-sec" id="raiding" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bolt"/></svg></span>
+                <h2><span class="rule-sec__num">06</span> Raiding</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r6-1" data-filter-item><a class="rule-item__num" href="#r6-1">6.1</a><p><strong>Raiding is allowed at any time.</strong></p></li>
+                <li class="rule-item" id="r6-2" data-filter-item><a class="rule-item__num" href="#r6-2">6.2</a><p>Raid only with legitimate in-game means such as tools, explosives and lockpicks.</p></li>
+                <li class="rule-item" id="r6-3" data-filter-item><a class="rule-item__num" href="#r6-3">6.3</a><p>No glitching through walls, gates, doors or terrain to get inside a base.</p></li>
+                <li class="rule-item" id="r6-4" data-filter-item><a class="rule-item__num" href="#r6-4">6.4</a><p>Don't log out inside another group's base.</p></li>
+                <li class="rule-item" id="r6-5" data-filter-item><a class="rule-item__num" href="#r6-5">6.5</a><p>Destroyed bases and stolen loot are not restored by staff.</p></li>
+              </ol>
+            </section>
+
+            <!-- 7. VEHICLES -->
+            <section class="rule-sec" id="vehicles" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-car"/></svg></span>
+                <h2><span class="rule-sec__num">07</span> Vehicles</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r7-1" data-filter-item><a class="rule-item__num" href="#r7-1">7.1</a><p>Don't hide vehicles inside walls, rocks or terrain.</p></li>
+                <li class="rule-item" id="r7-2" data-filter-item><a class="rule-item__num" href="#r7-2">7.2</a><p>Don't use vehicles to block roads, bridges or spawn areas.</p></li>
+                <li class="rule-item" id="r7-3" data-filter-item><a class="rule-item__num" href="#r7-3">7.3</a><p>Vehicle physics glitches (flying, wall-clipping) must not be abused – report them instead.</p></li>
+                <li class="rule-item" id="r7-4" data-filter-item><a class="rule-item__num" href="#r7-4">7.4</a><p>Vehicles lost to desync or bugs are not replaced.</p></li>
+              </ol>
+            </section>
+
+            <!-- 8. CHEATS & EXPLOITS -->
+            <section class="rule-sec" id="exploits" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-alert"/></svg></span>
+                <h2><span class="rule-sec__num">08</span> Cheats &amp; Exploits</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r8-1" data-filter-item><a class="rule-item__num" href="#r8-1">8.1</a><p><strong>Cheats, hacks, scripts, macros and any third-party software</strong> that gives an unfair advantage are strictly prohibited.</p></li>
+                <li class="rule-item" id="r8-2" data-filter-item><a class="rule-item__num" href="#r8-2">8.2</a><p>Exploiting bugs is prohibited – this includes duping, wall glitching and getting under the map.</p></li>
+                <li class="rule-item" id="r8-3" data-filter-item><a class="rule-item__num" href="#r8-3">8.3</a><p>Modified game files, custom textures or settings that remove grass, fog or darkness are prohibited.</p></li>
+                <li class="rule-item" id="r8-4" data-filter-item><a class="rule-item__num" href="#r8-4">8.4</a><p>Knowingly playing with a cheater – or benefiting from their loot – is punished like cheating.</p></li>
+                <li class="rule-item" id="r8-5" data-filter-item><a class="rule-item__num" href="#r8-5">8.5</a><p>Found a bug? Report it to staff. Players who report exploits responsibly won't be punished.</p></li>
+              </ol>
+            </section>
+
+            <!-- 9. STAFF & REPORTS -->
+            <section class="rule-sec" id="staff" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-flag"/></svg></span>
+                <h2><span class="rule-sec__num">09</span> Staff &amp; Reports</h2>
+              </header>
+              <ol class="rule-items">
+                <li class="rule-item" id="r9-1" data-filter-item><a class="rule-item__num" href="#r9-1">9.1</a><p>Report rule breaks through a <a href="support.html#report">Discord ticket</a> – with video evidence wherever possible.</p></li>
+                <li class="rule-item" id="r9-2" data-filter-item><a class="rule-item__num" href="#r9-2">9.2</a><p>False reports and edited evidence are punished.</p></li>
+                <li class="rule-item" id="r9-3" data-filter-item><a class="rule-item__num" href="#r9-3">9.3</a><p>Don't ask staff for items, teleports or refunds, and don't DM staff for support – use tickets.</p></li>
+                <li class="rule-item" id="r9-4" data-filter-item><a class="rule-item__num" href="#r9-4">9.4</a><p>Staff play by the same rules as everyone else and may spectate players to investigate reports.</p></li>
+              </ol>
+            </section>
+
+            <!-- 10. PENALTIES -->
+            <section class="rule-sec" id="penalties" data-filter-group>
+              <header class="rule-sec__head">
+                <span class="rule-sec__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gavel"/></svg></span>
+                <h2><span class="rule-sec__num">10</span> Penalties</h2>
+              </header>
+              <p class="rule-sec__intro" data-filter-item>Penalties escalate with repeated offences. Depending on the severity, staff may skip steps.</p>
+              <div class="table-wrap" data-filter-item>
+                <table class="table">
+                  <thead>
+                    <tr><th scope="col">Offence</th><th scope="col">First time</th><th scope="col">Repeated</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Spam, offensive name, minor toxicity</td><td><span class="pill pill--low">Warning</span></td><td><span class="pill pill--mid">24 h ban</span></td></tr>
+                    <tr><td>Building rule violations</td><td><span class="pill pill--low">Base removal</span></td><td><span class="pill pill--mid">3 day ban</span></td></tr>
+                    <tr><td>Combat logging, ghosting</td><td><span class="pill pill--mid">3 day ban</span></td><td><span class="pill pill--perm">Permanent</span></td></tr>
+                    <tr><td>Teaming beyond the group limit</td><td><span class="pill pill--mid">3 day ban (group)</span></td><td><span class="pill pill--perm">Permanent</span></td></tr>
+                    <tr><td>Exploiting bugs, duping, glitch raids</td><td><span class="pill pill--high">7 day ban</span></td><td><span class="pill pill--perm">Permanent</span></td></tr>
+                    <tr><td>Cheating, third-party software</td><td colspan="2"><span class="pill pill--perm">Permanent ban – all accounts</span></td></tr>
+                    <tr><td>Hate speech, real-life threats, doxxing</td><td colspan="2"><span class="pill pill--perm">Permanent ban</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <p class="empty" data-filter-empty hidden>No rules match your search. Try another word or <a href="support.html">ask the team</a>.</p>
+          </div>
+
+          <div class="callout callout--soft">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gavel"/></svg>
+            <div>
+              <p><strong>Think a penalty was unfair?</strong> You can appeal it once per ban. See <a href="support.html#appeal">Support → Ban appeal</a>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="index.html" aria-label="Project Blackout PVP – home">
+          <img class="brand__logo" src="assets/img/logo.svg" alt="" width="38" height="38">
+          <span class="brand__text">
+            <span class="brand__small">Project</span>
+            <span class="brand__big">Blackout</span>
+          </span>
+          <span class="tag">PVP</span>
+        </a>
+        <p>Hardcore DayZ PvP server. When the lights go out, the hunt begins.</p>
+        <a class="btn btn--ghost btn--sm" href="#" data-cfg-href="discord" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
+          Join our Discord
+        </a>
+      </div>
+
+      <nav class="footer__col" aria-label="Server pages">
+        <h3 class="footer__title">Server</h3>
+        <a href="index.html">Home</a>
+        <a href="server.html">Server info</a>
+        <a href="rules.html">Rules</a>
+        <a href="join.html">How to join</a>
+      </nav>
+
+      <nav class="footer__col" aria-label="Help pages">
+        <h3 class="footer__title">Help</h3>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
+        <a href="support.html#appeal">Ban appeal</a>
+        <a href="team.html">Team</a>
+      </nav>
+
+      <div class="footer__col">
+        <h3 class="footer__title">Connect</h3>
+        <button class="ip ip--sm" type="button" data-copy-ip title="Copy IP">
+          <span class="ip__text" data-cfg="address">–</span>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>
+          <span class="sr-only">copy</span>
+        </button>
+        <span data-cfg="map">–</span>
+        <span data-requires="restartTimes" hidden>Next restart: <span class="mono" data-restart-next>–</span> <span data-restart-tz></span></span>
+      </div>
+    </div>
+
+    <div class="container footer__bottom">
+      <p>© <span data-year></span> Project Blackout PVP</p>
+      <p>DayZ is a trademark of Bohemia Interactive a.s. This server is not officially affiliated with Bohemia Interactive.</p>
+    </div>
+  </footer>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+
+  <!-- ============ ICONS ============ -->
+  <svg width="0" height="0" class="sr-only" aria-hidden="true">
+    <symbol id="i-discord" viewBox="0 0 24 24"><path fill="currentColor" d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.1.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="i-crosshair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><path d="M12 1.5V6M12 18v4.5M1.5 12H6M18 12h4.5"/></symbol>
+    <symbol id="i-wall" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M3 15h18M12 9v6M8 3v6M16 3v6M8 15v6M16 15v6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+    <symbol id="i-gavel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.12 2.12 0 1 1-3-3l8-8"/><path d="m16 16 6-6M8 8l6-6M9 7l8 8M21 11l-8-8"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
+  </svg>
+</body>
+</html>

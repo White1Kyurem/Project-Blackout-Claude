@@ -9,29 +9,28 @@
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="Project Blackout PVP – DayZ Hardcore PvP Server">
-  <meta property="og:description" content="When the lights go out, the hunt begins. Airdrops, base building, raids and uncompromising PvP.">
+  <meta property="og:description" content="Project Blackout PVP – a hardcore DayZ PvP server with airdrops, base building, raids and an active community. When the lights go out, the hunt begins.">
   <meta property="og:image" content="assets/img/fortress.webp">
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/img/fortress.webp" as="image" type="image/webp">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Oswald:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/style.css">
 
   <script>document.documentElement.classList.add('js');</script>
   <script src="assets/js/config.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </head>
-<body>
+<body class="page-home">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <!-- ============ NAVIGATION ============ -->
   <header class="nav" id="nav">
     <div class="container nav__inner">
-      <a class="brand" href="#start" aria-label="Project Blackout PVP – back to top">
+      <a class="brand" href="index.html" aria-label="Project Blackout PVP – home">
         <img class="brand__logo" src="assets/img/logo.svg" alt="" width="38" height="38">
         <span class="brand__text">
           <span class="brand__small">Project</span>
@@ -41,12 +40,13 @@
       </a>
 
       <nav class="nav__menu" id="nav-menu" aria-label="Main navigation">
-        <a class="nav__link" href="#server">Server</a>
-        <a class="nav__link" href="#features">Features</a>
-        <a class="nav__link" href="#airdrops">Airdrops</a>
-        <a class="nav__link" href="#rules">Rules</a>
-        <a class="nav__link" href="#gallery">Gallery</a>
-        <a class="nav__link" href="#join">Join</a>
+        <a class="nav__link" href="index.html" aria-current="page">Home</a>
+        <a class="nav__link" href="server.html">Server</a>
+        <a class="nav__link" href="rules.html">Rules</a>
+        <a class="nav__link" href="join.html">Join</a>
+        <a class="nav__link" href="faq.html">FAQ</a>
+        <a class="nav__link" href="team.html">Team</a>
+        <a class="nav__link" href="support.html">Support</a>
         <a class="btn btn--primary btn--sm nav__cta" href="#" data-cfg-href="discord" target="_blank" rel="noopener">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
           Discord
@@ -75,7 +75,7 @@
         </h1>
         <p class="hero__tagline">When the lights go out, the hunt begins.</p>
         <div class="hero__actions">
-          <a class="btn btn--primary btn--lg" href="#join">Play now</a>
+          <a class="btn btn--primary btn--lg" href="join.html">Play now</a>
           <a class="btn btn--ghost btn--lg" href="#" data-cfg-href="discord" target="_blank" rel="noopener">
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
             Join Discord
@@ -92,7 +92,7 @@
     <section class="status-wrap" aria-label="Server information">
       <div class="container">
         <div class="status">
-          <div class="status__item" data-live hidden>
+          <div class="status__item" data-requires="battlemetricsId" hidden>
             <span class="status__label">Status</span>
             <span class="status__value">
               <span class="dot" data-status-dot></span>
@@ -119,9 +119,14 @@
             <span class="status__value" data-cfg="map">–</span>
           </div>
 
-          <a class="btn btn--primary status__cta" href="#" data-cfg-href="discord" target="_blank" rel="noopener">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
-            Community
+          <div class="status__item" data-requires="restartTimes" hidden>
+            <span class="status__label">Next restart</span>
+            <span class="status__value mono" data-restart-countdown>--:--:--</span>
+          </div>
+
+          <a class="btn btn--primary status__cta" href="server.html">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-server"/></svg>
+            Server info
           </a>
         </div>
       </div>
@@ -222,74 +227,54 @@
       </div>
     </section>
 
-    <!-- ============ RULES ============ -->
+    <!-- ============ RULES (TEASER) ============ -->
     <section class="section" id="rules">
       <div class="container">
         <header class="section__head reveal">
-          <p class="eyebrow">// 04 — Rulebook</p>
-          <h2 class="h2">The <span class="accent">Rules</span></h2>
-          <p class="section__sub">Hard fights need fair rules. By joining the server, you accept them.</p>
+          <p class="eyebrow">// 04 — Rules</p>
+          <h2 class="h2">Play hard, <span class="accent">play fair</span></h2>
+          <p class="section__sub">The most important rules at a glance. The full rulebook covers everything from base building to penalties.</p>
         </header>
 
-        <div class="rules">
-          <details class="rule reveal" open>
-            <summary>
-              <span class="rule__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg></span>
-              <span class="rule__title">General</span>
-              <span class="rule__chev" aria-hidden="true"></span>
-            </summary>
-            <ol class="rule__list">
-              <li>Be respectful – no insults, no racism, no discrimination.</li>
-              <li>Cheats, hacks, macros and third-party tools are prohibited.</li>
-              <li>Report bugs and glitches – don't exploit them.</li>
-              <li>Admin decisions are final.</li>
-            </ol>
-          </details>
-
-          <details class="rule reveal">
-            <summary>
-              <span class="rule__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-crosshair"/></svg></span>
-              <span class="rule__title">PvP</span>
-              <span class="rule__chev" aria-hidden="true"></span>
-            </summary>
-            <ol class="rule__list">
-              <li>Kill on sight is allowed – everywhere on the map.</li>
-              <li>No combat logging: logging out mid-fight can get you banned.</li>
-              <li>No ghosting – don't relog to flank your enemies.</li>
-              <li>No deliberate spawn camping.</li>
-            </ol>
-          </details>
-
-          <details class="rule reveal">
-            <summary>
-              <span class="rule__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wall"/></svg></span>
-              <span class="rule__title">Base Building</span>
-              <span class="rule__chev" aria-hidden="true"></span>
-            </summary>
-            <ol class="rule__list">
-              <li>No bases in military zones, large cities or at airdrop locations.</li>
-              <li>No glitch bases – nothing inside rocks, trees or building walls.</li>
-              <li>Every base must be raidable without glitches.</li>
-              <li>Roads and bridges must not be blocked.</li>
-            </ol>
-          </details>
-
-          <details class="rule reveal">
-            <summary>
-              <span class="rule__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bolt"/></svg></span>
-              <span class="rule__title">Raids</span>
-              <span class="rule__chev" aria-hidden="true"></span>
-            </summary>
-            <ol class="rule__list">
-              <li>Raiding is allowed – only with legitimate means such as tools and explosives.</li>
-              <li>No raiding through glitches, walls or map exploits.</li>
-              <li>Destroyed bases will not be restored by admins.</li>
-              <li>Suspect a rule violation? Save the clip and report it on Discord.</li>
-            </ol>
-          </details>
+        <div class="features features--compact">
+          <a class="card card--link reveal" href="rules.html#exploits">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg></div>
+            <h3 class="card__title">No cheats or exploits</h3>
+            <p>Cheating, duping and glitching end with a permanent ban.</p>
+          </a>
+          <a class="card card--link reveal" href="rules.html#pvp">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-crosshair"/></svg></div>
+            <h3 class="card__title">KOS is allowed</h3>
+            <p>Kill on sight is part of the game – everywhere on the map.</p>
+          </a>
+          <a class="card card--link reveal" href="rules.html#r3-2">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bolt"/></svg></div>
+            <h3 class="card__title">No combat logging</h3>
+            <p>Logging out mid-fight to save your gear is a bannable offence.</p>
+          </a>
+          <a class="card card--link reveal" href="rules.html#building">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wall"/></svg></div>
+            <h3 class="card__title">Legit bases only</h3>
+            <p>No glitch bases. Every base must be raidable by legit means.</p>
+          </a>
+          <a class="card card--link reveal" href="rules.html#groups">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg></div>
+            <h3 class="card__title">Group limit</h3>
+            <p>Respect the group limit – no teaming with other groups.</p>
+          </a>
+          <a class="card card--link reveal" href="support.html#report">
+            <div class="card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-flag"/></svg></div>
+            <h3 class="card__title">Report with evidence</h3>
+            <p>Saw a rule break? Clip it and open a ticket on Discord.</p>
+          </a>
         </div>
 
-        <p class="rules__note reveal">You'll find the complete and up-to-date rulebook on our <a href="#" data-cfg-href="discord" target="_blank" rel="noopener">Discord</a>. Violations can result in a kick or ban.</p>
+        <div class="btn-row reveal">
+          <a class="btn btn--primary" href="rules.html">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg>
+            Read the full rulebook
+          </a>
+        </div>
       </div>
     </section>
 
@@ -355,6 +340,29 @@
           </li>
         </ol>
 
+        <div class="links reveal">
+          <a class="link-card" href="join.html">
+            <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-download"/></svg>
+            <span class="link-card__text"><strong>Join guide</strong><small>Launchers, mods &amp; fixes</small></span>
+            <svg class="link-card__arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+          <a class="link-card" href="server.html">
+            <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-server"/></svg>
+            <span class="link-card__text"><strong>Server info</strong><small>Restarts &amp; settings</small></span>
+            <svg class="link-card__arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+          <a class="link-card" href="faq.html">
+            <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-help"/></svg>
+            <span class="link-card__text"><strong>FAQ</strong><small>Quick answers</small></span>
+            <svg class="link-card__arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+          <a class="link-card" href="support.html">
+            <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-ticket"/></svg>
+            <span class="link-card__text"><strong>Support</strong><small>Reports &amp; appeals</small></span>
+            <svg class="link-card__arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+
         <div class="cta reveal">
           <div class="cta__text">
             <h2 class="cta__title">Ready for the <span class="accent">Blackout</span>?</h2>
@@ -380,7 +388,7 @@
   <footer class="footer">
     <div class="container footer__inner">
       <div class="footer__brand">
-        <a class="brand" href="#start" aria-label="Project Blackout PVP – back to top">
+        <a class="brand" href="index.html" aria-label="Project Blackout PVP – home">
           <img class="brand__logo" src="assets/img/logo.svg" alt="" width="38" height="38">
           <span class="brand__text">
             <span class="brand__small">Project</span>
@@ -389,21 +397,37 @@
           <span class="tag">PVP</span>
         </a>
         <p>Hardcore DayZ PvP server. When the lights go out, the hunt begins.</p>
+        <a class="btn btn--ghost btn--sm" href="#" data-cfg-href="discord" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
+          Join our Discord
+        </a>
       </div>
 
-      <nav class="footer__col" aria-label="Footer navigation">
-        <h3 class="footer__title">Navigation</h3>
-        <a href="#server">Server</a>
-        <a href="#features">Features</a>
-        <a href="#rules">Rules</a>
-        <a href="#join">Join</a>
+      <nav class="footer__col" aria-label="Server pages">
+        <h3 class="footer__title">Server</h3>
+        <a href="index.html">Home</a>
+        <a href="server.html">Server info</a>
+        <a href="rules.html">Rules</a>
+        <a href="join.html">How to join</a>
+      </nav>
+
+      <nav class="footer__col" aria-label="Help pages">
+        <h3 class="footer__title">Help</h3>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
+        <a href="support.html#appeal">Ban appeal</a>
+        <a href="team.html">Team</a>
       </nav>
 
       <div class="footer__col">
-        <h3 class="footer__title">Server</h3>
-        <span class="mono" data-cfg="address">–</span>
+        <h3 class="footer__title">Connect</h3>
+        <button class="ip ip--sm" type="button" data-copy-ip title="Copy IP">
+          <span class="ip__text" data-cfg="address">–</span>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>
+          <span class="sr-only">copy</span>
+        </button>
         <span data-cfg="map">–</span>
-        <a href="#" data-cfg-href="discord" target="_blank" rel="noopener">Discord</a>
+        <span data-requires="restartTimes" hidden>Next restart: <span class="mono" data-restart-next>–</span> <span data-restart-tz></span></span>
       </div>
     </div>
 
@@ -429,7 +453,7 @@
   <!-- ============ ICONS ============ -->
   <svg width="0" height="0" class="sr-only" aria-hidden="true">
     <symbol id="i-discord" viewBox="0 0 24 24"><path fill="currentColor" d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.1.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
     <symbol id="i-crosshair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><path d="M12 1.5V6M12 18v4.5M1.5 12H6M18 12h4.5"/></symbol>
     <symbol id="i-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
     <symbol id="i-wall" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M3 15h18M12 9v6M8 3v6M16 3v6M8 15v6M16 15v6"/></symbol>
@@ -437,6 +461,13 @@
     <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
     <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
     <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01M6 18h.01"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></symbol>
   </svg>
 </body>
 </html>
