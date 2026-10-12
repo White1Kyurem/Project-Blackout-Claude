@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="pb-bolt" x1="20" y1="10" x2="44" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e9d5ff"/>
+      <stop offset="0.45" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#6d28d9"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 3 57 17.5v29L32 61 7 46.5v-29Z" fill="#0c0912" stroke="#8b5cf6" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M32 10.5 50.5 21.2v21.6L32 53.5 13.5 42.8V21.2Z" stroke="#8b5cf6" stroke-opacity=".35" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M36 13 21 36h10l-3.5 15L44 27H33.5Z" fill="url(#pb-bolt)"/>
+</svg>
