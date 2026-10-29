@@ -65,3 +65,12 @@ python3 -m http.server
 
 Any static host works: GitHub Pages, Netlify, Cloudflare Pages or regular web space. Upload
 all files as they are.
+
+## 3D models
+
+`models/` holds game assets that are not part of the website. The website does not need them,
+so they can be left out when uploading.
+
+| Folder                   | Content                                                              |
+| ------------------------ | -------------------------------------------------------------------- |
+| `models/werkzeugwand/`   | Tool pegboard 150 × 80 cm with hooks and proxy markers (Blender, FBX, OBJ) |
