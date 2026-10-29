@@ -1,4 +1,4 @@
-"""Kachelbare Texturen für die Werkzeugwand, prozedural mit numpy erzeugt.
+"""Kachelbare Texturen für Werkzeug- und Waffenwand, prozedural mit numpy erzeugt.
 
 Je Material entstehen in texturen/:
     <name>_co.png      Farbe (sRGB)                                   Blender + DayZ
@@ -9,7 +9,8 @@ Je Material entstehen in texturen/:
     <name>_metal.png   Metallisch                                     Blender
     <name>.rvmat       DayZ-Material (Super-Shader), Pfade anpassen
 
-Lochwand_Platte: 1024 px = 1 m, Lochwand_Haken: 512 px = 25 cm.
+Lochwand_Platte: 1024 px = 1 m, Lochwand_Haken: 512 px = 25 cm,
+Lochwand_Gummi (Gewehrhaken der Waffenwand): 256 px = 25 cm.
 """
 
 import os
@@ -111,6 +112,17 @@ def _zink(n, rng):
     return farbe, rauheit, np.ones((n, n)), glanz, _normal(0.3 * korn, 0.05)
 
 
+def _gummi(n, rng):
+    """Schwarze Kunststoff-/Gummibeschichtung der Gewehrhaken."""
+    flecken = _rauschen(n, 3.0, rng, f_max=0.03)
+    korn = _rauschen(n, 1.0, rng, f_min=0.08)
+
+    farbe = np.array([0.075, 0.075, 0.08]) * (1 + 0.08 * flecken[..., None]) + 0.006 * korn[..., None]
+    rauheit = np.clip(0.72 + 0.05 * flecken + 0.03 * korn, 0, 1)
+    glanz = np.clip(0.10 + 0.02 * flecken, 0, 1)
+    return farbe, rauheit, np.zeros((n, n)), glanz, _normal(0.4 * korn, 0.06)
+
+
 def _rvmat(pfad, name, specular, power):
     stufe = """class Stage{nr}
 {{
@@ -144,13 +156,19 @@ def _rvmat(pfad, name, specular, power):
         f.write(text)
 
 
-def erzeuge(ordner):
-    """Schreibt alle Texturen und gibt {Material: {Kanal: Pfad}} zurück."""
+MATERIALIEN = (("lochwand_platte", _lack, 1024, 0.4, 40),
+               ("lochwand_haken", _zink, 512, 1.0, 90),
+               ("lochwand_gummi", _gummi, 256, 0.15, 20))
+
+
+def erzeuge(ordner, namen):
+    """Schreibt die Texturen der genannten Materialien, gibt {Material: {Kanal: Pfad}} zurück."""
     os.makedirs(ordner, exist_ok=True)
     rng = np.random.default_rng(1938)
     ergebnis = {}
-    for name, funktion, n, specular, power in (("lochwand_platte", _lack, 1024, 0.4, 40),
-                                               ("lochwand_haken", _zink, 512, 1.0, 90)):
+    for name, funktion, n, specular, power in MATERIALIEN:
+        if name not in namen:
+            continue
         farbe, rauheit, metall, glanz, normal = funktion(n, rng)
         pfade = {k: os.path.join(ordner, f"{name}_{k}.png")
                  for k in ("co", "nohq", "smdi", "normal", "rough", "metal")}

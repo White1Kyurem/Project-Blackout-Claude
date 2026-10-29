@@ -1,4 +1,4 @@
-"""Vorschaubilder für die Werkzeugwand (wird von generate_werkzeugwand.py --render aufgerufen).
+"""Vorschaubilder für Werkzeug- und Waffenwand (aufgerufen von generate_werkzeugwand.py --render).
 
 Baut eine Betonwand, Licht und Kameras auf und rendert mit Cycles. Die Szene wird
 nicht in die .blend gespeichert.
@@ -110,7 +110,7 @@ def _render(szene, kamera, pfad, breite, hoehe):
     print(f"Gerendert: {pfad}")
 
 
-def rendern(out, haken, samples, prozent=100):
+def rendern(out, haken, samples, prozent=100, waffen=()):
     szene = bpy.context.scene
     szene.render.engine = 'CYCLES'
     szene.cycles.device = 'CPU'
@@ -138,12 +138,18 @@ def rendern(out, haken, samples, prozent=100):
     ordner = os.path.join(out, "vorschau")
     os.makedirs(ordner, exist_ok=True)
     reihe_mitte = loch_z(8)
+    if waffen:
+        # Platzhalter-Gewehre für die Ansichten einblenden, Detail auf die rechten Auflagen
+        bpy.context.view_layer.layer_collection.children["Platzhalter_Waffen"].exclude = False
+        detail = _kamera(col, "Kamera_Detail", (1.05, -0.95, 0.55), (0.30, -0.09, 0.10), 40)
+    else:
+        detail = _kamera(col, "Kamera_Detail", (-0.78, -0.52, reihe_mitte + 0.24),
+                         (-0.36, -0.05, reihe_mitte - 0.02), 50)
 
     kameras = [
         ("vorschau_gesamt.jpg", _kamera(col, "Kamera_Gesamt", (-1.05, -2.2, 0.42),
                                         (0.02, -0.03, -0.02), 45), 1920, 1200),
-        ("vorschau_detail.jpg", _kamera(col, "Kamera_Detail", (-0.78, -0.52, reihe_mitte + 0.24),
-                                        (-0.36, -0.05, reihe_mitte - 0.02), 50), 1920, 1200),
+        ("vorschau_detail.jpg", detail, 1920, 1200),
         ("vorschau_seite.jpg", _kamera(col, "Kamera_Seite", (1.22, -0.62, 0.22),
                                        (0.38, -0.06, 0.0), 40), 1920, 1200),
     ]
@@ -162,6 +168,12 @@ def rendern(out, haken, samples, prozent=100):
         breite = 2 if obj["haken_typ"] == "doppel" else 1
         x = obj.location.x + (breite - 1) * RASTER / 2
         _text(col, haken_mat, f"{nr:02d}", (x, y_text, obj.location.z - 1.5 * RASTER), 0.018)
+    if waffen:
+        bpy.context.view_layer.layer_collection.children["Platzhalter_Waffen"].exclude = True
+        waffe_mat = _leuchtfarbe("Vorschau_Text_Waffe", (0.55, 0.03, 0.03, 1))
+        for leer in waffen:
+            _text(col, waffe_mat, f"Waffe {leer['waffe']}", (leer.location.x, y_text,
+                                                             leer.location.z + 0.03), 0.022)
     for obj in col.objects:
         if obj.type == 'LIGHT':
             obj.hide_render = True

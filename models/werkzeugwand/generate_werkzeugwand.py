@@ -1,16 +1,19 @@
-"""Werkzeugwand (Lochwand) 150 x 80 cm mit Haken – Generator für Blender.
+"""Werkzeugwand und Waffenwand (Lochwand) 150 x 80 cm mit Haken – Generator für Blender.
 
 Baut eine Lochwand mit Rundlochung Ø 10 mm im 38-mm-Raster und steckt Haken
 hinein, die nach vorne aus der Wand stehen. Jeder Haken bekommt ein Empty als
 Markierung für einen Proxy. Danach werden Texturen, .blend, FBX, OBJ und eine
 Positionsliste (CSV) geschrieben.
 
+Mit --variante waffenwand entsteht dieselbe Lochwand mit gummierten Gewehrhaken für
+sechs Waffen und einem Proxy-Empty je Waffe (Ausgabe in ../waffenwand).
+
 Ausführen (Blender 4.2 oder neuer):
     blender --background --python generate_werkzeugwand.py
     blender --background --python generate_werkzeugwand.py -- --render
 
 oder mit dem bpy-Modul aus PyPI:
-    python generate_werkzeugwand.py [--render] [--out ORDNER]
+    python generate_werkzeugwand.py [--variante waffenwand] [--render] [--out ORDNER]
 
 Einheiten: 1 Blender-Einheit = 1 Meter.
 Blender-Achsen: X = rechts, Z = oben, Vorderseite zeigt nach -Y (Frontansicht, Numpad 1).
@@ -77,8 +80,19 @@ HAKEN = [
 
 HAKEN_TYPEN = ("kurz", "lang", "doppel", "bogen", "ring")
 
+# --------------------------------------------------------------------------
+# Waffenwand: (Reihe, Tiefe) je Waffe, von oben nach unten. Jede Waffe liegt auf
+# zwei Gewehrhaken in den Spalten WAFFE_SPALTEN. "nah" liegt dicht an der Wand,
+# "fern" 10 cm weiter vorne, damit sich übereinander liegende Waffen nicht berühren.
+# --------------------------------------------------------------------------
+WAFFEN = [(1, "nah"), (4, "fern"), (7, "nah"), (10, "fern"), (13, "nah"), (16, "fern")]
+WAFFE_SPALTEN = (12, 26)  # 53 cm Abstand, passt für Waffen ab etwa 60 cm Länge
+GUMMI_R = 0.0045          # Gummierung der Gewehrhaken Ø 9 mm
+GEWEHR_TYPEN = ("gewehr_nah", "gewehr_fern")
+
 FARBE_PLATTE = (0.125, 0.205, 0.305, 1.0)  # taubenblau lackiert (linear)
 FARBE_HAKEN = (0.75, 0.76, 0.78, 1.0)     # verzinkt
+FARBE_GUMMI = (0.02, 0.02, 0.022, 1.0)    # schwarz gummiert
 
 
 def loch_x(spalte):
@@ -97,6 +111,8 @@ class MeshBuilder:
 
     def __init__(self, uv_skala=1.0):
         self.uv_skala = uv_skala
+        self.material = 0  # Materialindex für die folgenden Flächen
+        self.mats = []
         self.verts = []
         self.faces = []
         self.uvs = []
@@ -132,6 +148,7 @@ class MeshBuilder:
         self.faces.append([self._vertex(p) for p in pts])
         self.uvs.append(uvs)
         self.smooth.append(smooth)
+        self.mats.append(self.material)
 
     def quader(self, x0, x1, y0, y1, z0, z1):
         self.neues_teil()
@@ -189,7 +206,7 @@ class MeshBuilder:
                       for q in ring]
                 self.flaeche(ring, richtung, uv)
 
-    def mesh(self, name, material):
+    def mesh(self, name, *materialien):
         me = bpy.data.meshes.new(name)
         me.from_pydata(self.verts, [], self.faces)
         uv_layer = me.uv_layers.new(name="UVMap")
@@ -205,7 +222,9 @@ class MeshBuilder:
         scharf.data.foreach_set("value", [len(kanten_smooth.get(e.key, ())) != 1 or
                                           not next(iter(kanten_smooth[e.key]))
                                           for e in me.edges])
-        me.materials.append(material)
+        for material in materialien:
+            me.materials.append(material)
+        me.polygons.foreach_set("material_index", self.mats)
         me.validate(clean_customdata=False)
         me.update()
         return me
@@ -355,9 +374,62 @@ def baue_haken(typ):
                  for a in (2 * math.pi * i / 16 for i in range(16))]
         m.rohr(kreis, draht, geschlossen=True, ref=(0, 0, 1))
         proxy = tuple(mitte)
+    elif typ in GEWEHR_TYPEN:
+        # Ablage für eine Waffe: verzinkter Ansatz, dann gummierte Mulde mit hochgebogener
+        # Spitze. "fern" hat vorher einen Buckel, der die Waffe 10 cm vor der Wand hält.
+        m.rohr([start, (0, -0.014, ARM_Z)], DRAHT_R)
+        if typ == "gewehr_nah":
+            pfad, mitte_y = [(0, -0.090, ARM_Z), (0, -0.093, ARM_Z + 0.040)], -0.042
+        else:
+            pfad = [(0, -0.085, ARM_Z), (0, -0.097, ARM_Z + 0.020), (0, -0.109, ARM_Z),
+                    (0, -0.175, ARM_Z), (0, -0.177, ARM_Z + 0.040)]
+            mitte_y = -0.141
+        m.material = 1
+        m.rohr(abrunden([(0, -0.012, ARM_Z), *pfad], 0.008), GUMMI_R)
+        # Auflagepunkt: Mitte der Mulde, oben auf der Gummierung
+        proxy = (0, mitte_y, ARM_Z + GUMMI_R)
     else:
         raise ValueError(f"Unbekannter Hakentyp: {typ}")
     return m, Vector(proxy)
+
+
+def baue_platzhalter_waffe(art):
+    """Grobes Platzhalter-Gewehr zum Prüfen der Abstände (wird nicht exportiert).
+
+    Lauf zeigt nach +X, Ursprung = Auflagelinie in der Mitte der Waffe.
+    Material 0 = Metall, 1 = Holz.
+    """
+    m = MeshBuilder()
+
+    def teil(material, x0, x1, z0, z1, breite):
+        m.material = material
+        m.quader(x0, x1, -breite / 2, breite / 2, z0, z1)
+
+    if art == "repetierer":  # Repetiergewehr mit Zielfernrohr, 115 cm
+        teil(1, -0.575, -0.18, 0.0, 0.060, 0.042)    # Schaft
+        teil(1, -0.575, -0.45, -0.035, 0.065, 0.040)  # Kolben
+        teil(1, -0.18, -0.08, -0.040, 0.050, 0.034)  # Griffstück
+        teil(0, -0.08, 0.15, 0.0, 0.055, 0.036)      # System
+        teil(1, 0.15, 0.40, 0.0, 0.045, 0.040)       # Vorderschaft
+        teil(0, -0.05, -0.03, 0.055, 0.092, 0.012)   # Montagen
+        teil(0, 0.10, 0.12, 0.055, 0.092, 0.012)
+        teil(0, 0.0, 0.012, 0.030, 0.040, 0.075)     # Kammerstängel
+        m.material = 0
+        m.rohr([(0.15, 0, 0.035), (0.575, 0, 0.035)], 0.009, ref=(0, 0, 1))      # Lauf
+        m.rohr([(-0.10, 0, 0.105), (0.20, 0, 0.105)], 0.016, ref=(0, 0, 1))      # Zielfernrohr
+    else:  # Sturmgewehr mit Magazin, 90 cm
+        teil(1, -0.45, -0.17, 0.0, 0.065, 0.042)     # Schaft
+        teil(0, -0.16, -0.12, -0.085, 0.0, 0.028)    # Pistolengriff
+        teil(0, -0.17, 0.12, 0.0, 0.075, 0.040)      # Gehäuse
+        teil(0, 0.0, 0.045, -0.050, 0.0, 0.025)      # Magazin
+        teil(0, 0.008, 0.055, -0.090, -0.050, 0.025)
+        teil(0, 0.018, 0.066, -0.130, -0.090, 0.025)
+        teil(1, 0.12, 0.32, 0.0, 0.058, 0.045)       # Handschutz
+        teil(0, 0.12, 0.30, 0.058, 0.075, 0.020)     # Gasrohr
+        teil(0, 0.40, 0.415, 0.035, 0.070, 0.010)    # Korn
+        m.material = 0
+        m.rohr([(0.30, 0, 0.035), (0.45, 0, 0.035)], 0.008, ref=(0, 0, 1))       # Lauf
+    return m
 
 
 def baue_kollision():
@@ -414,10 +486,30 @@ def layer_collection(name):
     return bpy.context.view_layer.layer_collection.children[name]
 
 
-def pruefe_belegung():
+def einfaches_material(name, farbe, metallic, rauheit):
+    """Material ohne Texturen (nur für Platzhalter)."""
+    mat = bpy.data.materials.new(name)
+    mat.diffuse_color = farbe
+    if mat.node_tree is None and hasattr(mat, "use_nodes"):
+        mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = farbe
+    bsdf.inputs["Metallic"].default_value = metallic
+    bsdf.inputs["Roughness"].default_value = rauheit
+    return mat
+
+
+def belegung(variante):
+    """(Typ, Spalte, Reihe) aller Haken; bei der Waffenwand zwei Haken je Waffe."""
+    if variante == "werkzeugwand":
+        return HAKEN
+    return [(f"gewehr_{tiefe}", spalte, reihe) for reihe, tiefe in WAFFEN for spalte in WAFFE_SPALTEN]
+
+
+def pruefe_belegung(haken):
     belegt = {}
-    for nr, (typ, spalte, reihe) in enumerate(HAKEN, 1):
-        if typ not in HAKEN_TYPEN:
+    for nr, (typ, spalte, reihe) in enumerate(haken, 1):
+        if typ not in HAKEN_TYPEN + GEWEHR_TYPEN:
             raise ValueError(f"Haken {nr}: unbekannter Typ {typ!r}")
         breite = 2 if typ == "doppel" else 1
         for s in range(spalte, spalte + breite):
@@ -443,59 +535,98 @@ def pruefe_abstaende(objekte):
                 raise ValueError(f"{a[0]} und {b[0]} überschneiden sich")
 
 
-def baue_szene(out):
+def xyz(v):
+    return [f"{c:.4f}" for c in v]
+
+
+def objfbx(v):
+    """Blender-Koordinaten in die Achsen der FBX-/OBJ-Exporte (Y oben, vorne +Z)."""
+    return xyz((v.x, v.z, -v.y))
+
+
+def baue_szene(out, variante):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     szene = bpy.context.scene
     szene.unit_settings.system = 'METRIC'
     szene.unit_settings.scale_length = 1.0
     szene.unit_settings.length_unit = 'CENTIMETERS'
+    waffenwand = variante == "waffenwand"
+    typen = GEWEHR_TYPEN if waffenwand else HAKEN_TYPEN
 
-    maps = texturen.erzeuge(os.path.join(out, "texturen"))
+    namen = ["lochwand_platte", "lochwand_haken"] + (["lochwand_gummi"] if waffenwand else [])
+    maps = texturen.erzeuge(os.path.join(out, "texturen"), namen)
     mat_platte = material("Lochwand_Platte", FARBE_PLATTE, 0.0, 0.45, maps["lochwand_platte"])
-    mat_haken = material("Lochwand_Haken", FARBE_HAKEN, 1.0, 0.32, maps["lochwand_haken"])
+    mats_haken = [material("Lochwand_Haken", FARBE_HAKEN, 1.0, 0.32, maps["lochwand_haken"])]
+    if waffenwand:
+        mats_haken.append(material("Lochwand_Gummi", FARBE_GUMMI, 0.0, 0.75, maps["lochwand_gummi"]))
 
-    col_wand = collection("Werkzeugwand")
+    col_wand = collection(variante.capitalize())
     col_vorlagen = collection("Haken_Vorlagen")
     col_hilfe = collection("Hilfsobjekte")
 
     platte = objekt("Lochwand_Platte", baue_platte().mesh("Lochwand_Platte", mat_platte), col_wand)
 
-    meshes, proxies = {}, {}
-    for typ in HAKEN_TYPEN:
-        builder, proxy = baue_haken(typ)
-        meshes[typ] = builder.mesh(f"Haken_{typ}", mat_haken)
-        proxies[typ] = proxy
+    # Vorlagen: jeder Hakentyp am Ursprung, mit Empty am Proxy- bzw. Auflagepunkt
+    meshes, punkte = {}, {}
+    for typ in typen:
+        builder, punkt = baue_haken(typ)
+        meshes[typ] = builder.mesh(f"Haken_{typ}", *mats_haken)
+        punkte[typ] = punkt
         vorlage = objekt(f"Vorlage_Haken_{typ}", meshes[typ], col_vorlagen)
-        leer = objekt(f"Vorlage_Proxy_{typ}", None, col_vorlagen, proxy)
+        leer = objekt(f"Vorlage_{'Auflage' if waffenwand else 'Proxy'}_{typ}", None, col_vorlagen,
+                      punkt)
         leer.empty_display_type = 'ARROWS'
         leer.empty_display_size = 0.02
         leer.parent = vorlage
 
-    pruefe_belegung()
+    haken_liste = belegung(variante)
+    pruefe_belegung(haken_liste)
     haken_objekte, zeilen = [], []
-    for nr, (typ, spalte, reihe) in enumerate(HAKEN, 1):
+    for nr, (typ, spalte, reihe) in enumerate(haken_liste, 1):
         ort = Vector((loch_x(spalte), -TIEFE, loch_z(reihe)))
         obj = objekt(f"Haken_{nr:02d}_{typ}", meshes[typ], col_wand, ort)
         obj["haken_typ"] = typ
         obj["spalte"] = spalte
         obj["reihe"] = reihe
-        leer = objekt(f"Proxy_{nr:02d}_{typ}", None, col_wand, proxies[typ])
+        haken_objekte.append(obj)
+        if waffenwand:
+            continue
+        leer = objekt(f"Proxy_{nr:02d}_{typ}", None, col_wand, punkte[typ])
         leer.empty_display_type = 'ARROWS'
         leer.empty_display_size = 0.03
         leer.parent = obj
-        haken_objekte.append(obj)
-        p = ort + proxies[typ]
-        zeilen.append([nr, obj.name, leer.name, typ, spalte, reihe,
-                       *(f"{c:.4f}" for c in ort), *(f"{c:.4f}" for c in p),
-                       *(f"{c:.4f}" for c in (p.x, p.z, -p.y))])
+        p = ort + punkte[typ]
+        zeilen.append([nr, obj.name, leer.name, typ, spalte, reihe, *xyz(ort), *xyz(p), *objfbx(p)])
     pruefe_abstaende(haken_objekte)
+
+    # Waffenwand: ein Proxy-Empty je Waffe mittig zwischen den beiden Auflagen
+    waffen = []
+    if waffenwand:
+        col_platzhalter = collection("Platzhalter_Waffen")
+        metall = einfaches_material("Platzhalter_Metall", (0.03, 0.03, 0.035, 1), 0.7, 0.4)
+        holz = einfaches_material("Platzhalter_Holz", (0.09, 0.04, 0.018, 1), 0.0, 0.6)
+        art = {"nah": "repetierer", "fern": "sturmgewehr"}
+        platzhalter = {a: baue_platzhalter_waffe(a).mesh(f"Platzhalter_{a}", metall, holz)
+                       for a in ("repetierer", "sturmgewehr")}
+        for nr, (reihe, tiefe) in enumerate(WAFFEN, 1):
+            links, rechts = haken_objekte[2 * nr - 2], haken_objekte[2 * nr - 1]
+            p = (links.location + punkte[links["haken_typ"]]
+                 + rechts.location + punkte[rechts["haken_typ"]]) / 2
+            leer = objekt(f"Proxy_Waffe_{nr}", None, col_wand, p)
+            leer.empty_display_type = 'ARROWS'
+            leer.empty_display_size = 0.08
+            leer["waffe"] = nr
+            waffen.append(leer)
+            objekt(f"Platzhalter_Waffe_{nr}", platzhalter[art[tiefe]], col_platzhalter, p)
+            zeilen.append([nr, leer.name, reihe, tiefe, links.name, rechts.name,
+                           *xyz(p), *objfbx(p), "+X"])
 
     kollision = objekt("Lochwand_Kollision", baue_kollision().mesh("Lochwand_Kollision", mat_platte),
                        col_hilfe)
     kollision.display_type = 'WIRE'
     kollision.hide_render = True
     col_hilfe.hide_render = True
-    return platte, haken_objekte, kollision, zeilen
+    return platte, haken_objekte, kollision, zeilen, waffen, typen
 
 
 def waehle(objekte):
@@ -541,52 +672,64 @@ def viewport_raster():
 
 def main(argv):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--out", default=os.path.dirname(os.path.abspath(__file__)))
+    parser.add_argument("--variante", choices=("werkzeugwand", "waffenwand"), default="werkzeugwand")
+    parser.add_argument("--out", help="Zielordner (Standard: models/<variante>)")
     parser.add_argument("--render", action="store_true", help="Vorschaubilder rendern")
     parser.add_argument("--samples", type=int, default=64)
     parser.add_argument("--prozent", type=int, default=100, help="Auflösung der Vorschau in %%")
     args = parser.parse_args(argv)
-    out = os.path.abspath(args.out)
+    hier = os.path.dirname(os.path.abspath(__file__))
+    out = os.path.abspath(args.out or os.path.join(os.path.dirname(hier), args.variante))
     teile = os.path.join(out, "einzelteile")
     os.makedirs(teile, exist_ok=True)
 
-    platte, haken, kollision, zeilen = baue_szene(out)
+    platte, haken, kollision, zeilen, waffen, typen = baue_szene(out, args.variante)
 
-    empties = [c for h in haken for c in h.children]
+    empties = [c for h in haken for c in h.children] + waffen
     for endung in ("fbx", "obj"):
-        exportiere(os.path.join(out, f"werkzeugwand.{endung}"), [platte, *haken, *empties],
+        exportiere(os.path.join(out, f"{args.variante}.{endung}"), [platte, *haken, *empties],
                    mit_empties=True)
         exportiere(os.path.join(teile, f"lochwand_platte.{endung}"), [platte])
         exportiere(os.path.join(teile, f"lochwand_kollision.{endung}"), [kollision])
-        for typ in HAKEN_TYPEN:
+        for typ in typen:
             vorlage = bpy.data.objects[f"Vorlage_Haken_{typ}"]
             exportiere(os.path.join(teile, f"haken_{typ}.{endung}"), [vorlage, *vorlage.children],
                        mit_empties=True)
 
-    with open(os.path.join(out, "proxy_positionen.csv"), "w", newline="", encoding="utf-8") as f:
+    if waffen:
+        datei, kopf = "waffen_positionen.csv", [
+            "nr", "proxy", "reihe", "tiefe", "haken_links", "haken_rechts",
+            "proxy_blender_x", "proxy_blender_y", "proxy_blender_z",
+            "proxy_objfbx_x", "proxy_objfbx_y", "proxy_objfbx_z", "lauf_richtung"]
+    else:
+        datei, kopf = "proxy_positionen.csv", [
+            "nr", "haken", "proxy", "typ", "spalte", "reihe",
+            "haken_blender_x", "haken_blender_y", "haken_blender_z",
+            "proxy_blender_x", "proxy_blender_y", "proxy_blender_z",
+            "proxy_objfbx_x", "proxy_objfbx_y", "proxy_objfbx_z"]
+    with open(os.path.join(out, datei), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["nr", "haken", "proxy", "typ", "spalte", "reihe",
-                    "haken_blender_x", "haken_blender_y", "haken_blender_z",
-                    "proxy_blender_x", "proxy_blender_y", "proxy_blender_z",
-                    "proxy_objfbx_x", "proxy_objfbx_y", "proxy_objfbx_z"])
+        w.writerow(kopf)
         w.writerows(zeilen)
 
     layer_collection("Haken_Vorlagen").exclude = True
     layer_collection("Hilfsobjekte").hide_viewport = True
+    if waffen:
+        layer_collection("Platzhalter_Waffen").exclude = True
     viewport_raster()
     bpy.ops.object.select_all(action='DESELECT')
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, "werkzeugwand.blend"), compress=True)
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, f"{args.variante}.blend"), compress=True)
 
     gesamt = dreiecke(platte) + sum(dreiecke(h) for h in haken)
     print(f"Lochwand: {dreiecke(platte)} Dreiecke, {len(haken)} Haken, gesamt {gesamt} Dreiecke")
     if gesamt > MAX_DREIECKE:
         print(f"WARNUNG: mehr als {MAX_DREIECKE} Dreiecke")
-    for typ in HAKEN_TYPEN:
+    for typ in typen:
         print(f"  Haken {typ}: {dreiecke(bpy.data.objects[f'Vorlage_Haken_{typ}'])} Dreiecke")
 
     if args.render:
         import vorschau
-        vorschau.rendern(out, haken, args.samples, args.prozent)
+        vorschau.rendern(out, haken, args.samples, args.prozent, waffen)
 
 
 if __name__ == "__main__":

@@ -162,6 +162,9 @@ Python-Version):
 python generate_werkzeugwand.py --render
 ```
 
+Mit `--variante waffenwand` erzeugt dasselbe Skript die [Waffenwand](../waffenwand/) in
+`models/waffenwand/`.
+
 Größe, Raster, Lochdurchmesser, Blechstärke, Drahtstärke und die Polygonzahl stehen als
 Konstanten oben im Skript. `LOCH_SEGMENTE` ist die Kantenzahl je Loch: 16 = runder
 (+2 800 Dreiecke), 8 = sparsamer (−2 800 Dreiecke). `SEITEN` steuert die Kanten des

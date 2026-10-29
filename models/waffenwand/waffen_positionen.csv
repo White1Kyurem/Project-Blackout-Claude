@@ -1,0 +1,7 @@
+nr,proxy,reihe,tiefe,haken_links,haken_rechts,proxy_blender_x,proxy_blender_y,proxy_blender_z,proxy_objfbx_x,proxy_objfbx_y,proxy_objfbx_z,lauf_richtung
+1,Proxy_Waffe_1,1,nah,Haken_01_gewehr_nah,Haken_02_gewehr_nah,0.0000,-0.0670,0.3205,0.0000,0.3205,0.0670,+X
+2,Proxy_Waffe_2,4,fern,Haken_03_gewehr_fern,Haken_04_gewehr_fern,0.0000,-0.1660,0.2065,0.0000,0.2065,0.1660,+X
+3,Proxy_Waffe_3,7,nah,Haken_05_gewehr_nah,Haken_06_gewehr_nah,0.0000,-0.0670,0.0925,0.0000,0.0925,0.0670,+X
+4,Proxy_Waffe_4,10,fern,Haken_07_gewehr_fern,Haken_08_gewehr_fern,0.0000,-0.1660,-0.0215,0.0000,-0.0215,0.1660,+X
+5,Proxy_Waffe_5,13,nah,Haken_09_gewehr_nah,Haken_10_gewehr_nah,0.0000,-0.0670,-0.1355,0.0000,-0.1355,0.0670,+X
+6,Proxy_Waffe_6,16,fern,Haken_11_gewehr_fern,Haken_12_gewehr_fern,0.0000,-0.1660,-0.2495,0.0000,-0.2495,0.1660,+X

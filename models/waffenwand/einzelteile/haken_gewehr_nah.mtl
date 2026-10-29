@@ -1,0 +1,26 @@
+# Blender 5.2.3 LTS MTL File: 'None'
+# www.blender.org
+
+newmtl Lochwand_Gummi
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../texturen/lochwand_gummi_co.png
+map_Ns ../texturen/lochwand_gummi_rough.png
+map_refl ../texturen/lochwand_gummi_metal.png
+map_Bump -bm 1.000000 ../texturen/lochwand_gummi_normal.png
+
+newmtl Lochwand_Haken
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../texturen/lochwand_haken_co.png
+map_Ns ../texturen/lochwand_haken_rough.png
+map_refl ../texturen/lochwand_haken_metal.png
+map_Bump -bm 1.000000 ../texturen/lochwand_haken_normal.png

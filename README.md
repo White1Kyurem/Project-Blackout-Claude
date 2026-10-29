@@ -74,3 +74,4 @@ so they can be left out when uploading.
 | Folder                   | Content                                                              |
 | ------------------------ | -------------------------------------------------------------------- |
 | `models/werkzeugwand/`   | Tool pegboard 150 × 80 cm with round holes, hooks, proxy markers and textures (Blender, FBX, OBJ, DayZ rvmat) |
+| `models/waffenwand/`     | Same pegboard as a weapon wall for 6 weapons, one proxy marker per weapon |
