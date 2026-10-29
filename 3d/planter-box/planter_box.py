@@ -42,7 +42,9 @@ P = {
     "rim_t": 0.025,         # thickness of the top rim boards
     "rim_overhang": 0.015,  # rim overhang past the posts
     "soil_drop": 0.055,     # soil surface below the top of the rim
-    "pebbles": 14,          # pebbles per bed
+    "pebbles": 10,          # pebbles per bed
+    "clods": 40,            # loose soil clods per bed
+    "bark_chips": 12,       # bark chips per bed
     "seed": 7,              # random seed (soil, pebbles, wood grain)
 }
 
@@ -57,6 +59,7 @@ CLEAT = 0.035        # cleats carrying the bottom slats
 DIVIDER_T = 0.018    # divider board thickness
 BATTEN_W = 0.06      # outer middle batten on the long sides
 BATTEN_T = 0.018
+SOIL_VERTS = 1500    # soil surface vertices per bed (upper bound)
 
 
 # --------------------------------------------------------------------------
@@ -69,11 +72,14 @@ def project_uv(face, uv_layer, grain, u_offset, center):
     """Planar UVs in metres. U follows the wood grain on long faces, V is
     measured from the centre line of the part (the wood shader places the
     tree's pith relative to it)."""
-    n = face.normal
-    dominant = max(range(3), key=lambda i: abs(n[i]))
-    a, b = [i for i in range(3) if i != dominant]
-    if AXIS[grain] == b:
-        a, b = b, a
+    if grain == "TOP":  # straight down, for small loose bits
+        a, b = 0, 1
+    else:
+        n = face.normal
+        dominant = max(range(3), key=lambda i: abs(n[i]))
+        a, b = [i for i in range(3) if i != dominant]
+        if AXIS[grain] == b:
+            a, b = b, a
     for loop in face.loops:
         co = loop.vert.co
         loop[uv_layer].uv = (co[a] + u_offset, co[b] - center[b])
@@ -273,6 +279,37 @@ class Nodes:
                 self.link(v, node.inputs[i])
         return node.outputs[0]
 
+    def vmath(self, op, a, b=None, c=None):
+        node = self.new("ShaderNodeVectorMath", operation=op)
+        for i, v in enumerate((a, b, c)):
+            if v is None:
+                continue
+            if isinstance(v, (int, float, tuple)):
+                node.inputs[i].default_value = (v, v, v) if isinstance(v, (int, float)) else v
+            else:
+                self.link(v, node.inputs[i])
+        return node.outputs[0]
+
+    def mix(self, fac, a, b, blend="MIX"):
+        """Colour mix; sockets are picked by identifier (stable across versions)."""
+        node = self.new("ShaderNodeMix", data_type="RGBA", blend_type=blend)
+        sockets = {s.identifier: s for s in node.inputs}
+        for key, v in (("Factor_Float", fac), ("A_Color", a), ("B_Color", b)):
+            if isinstance(v, (int, float, tuple)):
+                sockets[key].default_value = v
+            else:
+                self.link(v, sockets[key])
+        return next(s for s in node.outputs if s.identifier == "Result_Color")
+
+    def curve(self, fac, lo, hi):
+        """Smooth 0..1 step from lo to hi (a grey colour ramp)."""
+        return self.ramp(fac, [(lo, (0, 0, 0, 1)), (hi, (1, 1, 1, 1))])
+
+    def channels(self, color):
+        node = self.new("ShaderNodeSeparateColor")
+        self.link(color, node.inputs["Color"])
+        return node.outputs["Red"], node.outputs["Green"], node.outputs["Blue"]
+
     def scale(self, vec, s):
         node = self.new("ShaderNodeVectorMath", operation="MULTIPLY")
         self.link(vec, node.inputs[0])
@@ -288,8 +325,8 @@ class Nodes:
         node.inputs["Distortion"].default_value = distortion
         return node
 
-    def voronoi(self, vec, scale, randomness=1.0):
-        node = self.new("ShaderNodeTexVoronoi")
+    def voronoi(self, vec, scale, randomness=1.0, feature="F1"):
+        node = self.new("ShaderNodeTexVoronoi", feature=feature)
         self.link(vec, node.inputs["Vector"])
         node.inputs["Scale"].default_value = scale
         node.inputs["Randomness"].default_value = randomness
@@ -337,7 +374,7 @@ def get_material(name, viewport):
 
 
 def wood_material():
-    mat = get_material("Planter_Wood", srgb(170, 132, 92))
+    mat = get_material("Planter_Wood", srgb(104, 75, 46))
     n = Nodes(mat)
     uv = n.uv()
     sep = n.new("ShaderNodeSeparateXYZ")
@@ -373,15 +410,15 @@ def wood_material():
     streaks = n.noise(n.scale(uv, (0.8, 10.0, 0.8)), 1.0, 3.0, 0.5).outputs["Fac"]
     grain = n.math("MULTIPLY_ADD", rings, 0.5,
                    n.math("MULTIPLY_ADD", fibres, 0.25, n.math("MULTIPLY", streaks, 0.35)))
-    color = n.ramp(grain, [(0.2, srgb(204, 160, 108)), (0.45, srgb(182, 134, 86)),
-                           (0.75, srgb(146, 100, 60)), (1.0, srgb(118, 78, 44))])
+    color = n.ramp(grain, [(0.2, srgb(128, 96, 62)), (0.45, srgb(106, 76, 46)),
+                           (0.75, srgb(82, 57, 34)), (1.0, srgb(60, 41, 24))])
     # per-board tint
     tint = along(0.02, 23.1)
     hsv = n.new("ShaderNodeHueSaturation")
     n.link(color, hsv.inputs["Color"])
     n.link(n.math("MULTIPLY_ADD", tint, 0.6, 0.7), hsv.inputs["Value"])
-    n.link(n.math("MULTIPLY_ADD", tint, 0.4, 0.75), hsv.inputs["Saturation"])
-    rough = n.math("MULTIPLY_ADD", grain, 0.25, 0.6)
+    n.link(n.math("MULTIPLY_ADD", tint, 0.3, 0.8), hsv.inputs["Saturation"])
+    rough = n.math("MULTIPLY_ADD", grain, 0.2, 0.55)
     n.bsdf(hsv.outputs["Color"], rough, height=n.math("MULTIPLY_ADD", rings, 0.3, fibres),
            strength=0.04, distance=0.0008)
     return mat
@@ -391,27 +428,68 @@ def soil_material():
     mat = get_material("Planter_Soil", srgb(52, 38, 28))
     n = Nodes(mat)
     uv = n.uv()
-    clumps = n.voronoi(uv, 70.0).outputs["Distance"]
-    large = n.noise(uv, 9.0, 4.0, 0.6).outputs["Fac"]
-    fine = n.noise(uv, 160.0, 2.0, 0.5).outputs["Fac"]
-    value = n.math("MULTIPLY_ADD", large, 0.55, n.math("MULTIPLY", fine, 0.3))
-    value = n.math("SUBTRACT", value, n.math("MULTIPLY", clumps, 0.25))
-    value = n.math("MINIMUM", n.math("MAXIMUM", value, 0.0), 0.84)
-    # perlite specks, as in bagged potting soil
-    specks = n.voronoi(uv, 140.0).outputs["Distance"]
-    speck_mask = n.math("MULTIPLY", n.math("LESS_THAN", specks, 0.09),
-                        n.math("GREATER_THAN", fine, 0.5))
-    value = n.math("MAXIMUM", value, speck_mask)
-    color = n.ramp(value, [(0.15, srgb(28, 19, 13)), (0.5, srgb(48, 34, 24)),
-                           (0.84, srgb(82, 60, 42)), (0.92, srgb(226, 224, 216))])
+    # warp the coordinates so crumbs are not perfect cells
+    warp = n.noise(uv, 45.0, 3.0, 0.6).outputs["Color"]
+    wuv = n.vmath("MULTIPLY_ADD", warp, 0.006, uv)
+
+    # crumb structure at two sizes: 0 in the cracks, 1 on top of a crumb
+    fine = n.voronoi(wuv, 240.0, feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    coarse = n.voronoi(wuv, 60.0, feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    fine_top = n.curve(fine, 0.0, 0.2)
+    coarse_top = n.curve(coarse, 0.0, 0.3)
+    crumbs = n.math("MULTIPLY_ADD", coarse_top, 0.55, n.math("MULTIPLY", fine_top, 0.45))
+
+    # moist base colour with slow variation, drier and greyer patches on top
+    patches = n.noise(uv, 6.0, 4.0, 0.6).outputs["Fac"]
+    moist = n.ramp(patches, [(0.35, srgb(40, 29, 21)), (0.65, srgb(66, 48, 35))])
+    dry_patch = n.curve(n.noise(uv, 3.0, 3.0, 0.55).outputs["Fac"], 0.45, 0.7)
+    dryness = n.math("MULTIPLY", dry_patch, n.curve(crumbs, 0.4, 0.9))
+    color = n.mix(n.math("MULTIPLY", dryness, 0.75), moist, srgb(104, 86, 70))
+
+    # peat fibres: thin light strands along some crumb edges
+    strands = n.voronoi(n.scale(wuv, (1.0, 3.0, 1.0)), 30.0,
+                        feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    strand_mask = n.math("MULTIPLY", n.math("LESS_THAN", strands, 0.012),
+                         n.curve(n.noise(uv, 12.0, 2.0, 0.5).outputs["Fac"], 0.55, 0.65))
+    color = n.mix(n.math("MULTIPLY", strand_mask, 0.7), color, srgb(124, 92, 60))
+
+    # small bark flakes
+    flakes = n.voronoi(n.scale(wuv, (1.0, 2.4, 1.0)), 38.0)
+    fr, _, _ = n.channels(flakes.outputs["Color"])
+    flake_mask = n.math("MULTIPLY", n.math("GREATER_THAN", fr, 0.965),
+                        n.math("LESS_THAN", flakes.outputs["Distance"], 0.35))
+    color = n.mix(flake_mask, color, srgb(62, 40, 27))
+
+    # perlite: sparse white grains of different sizes
+    grains = n.voronoi(wuv, 120.0)
+    gr, gg, _ = n.channels(grains.outputs["Color"])
+    radius = n.math("MULTIPLY_ADD", gg, 0.16, 0.06)
+    perlite = n.math("MULTIPLY", n.math("GREATER_THAN", gr, 0.82),
+                     n.math("LESS_THAN", grains.outputs["Distance"], radius))
+    color = n.mix(perlite, color, srgb(212, 208, 198))
+
+    # cracks between crumbs stay dark
+    cavity = n.ramp(crumbs, [(0.0, (0.3, 0.3, 0.3, 1.0)), (0.6, (1.0, 1.0, 1.0, 1.0))])
+    color = n.mix(1.0, color, cavity, blend="MULTIPLY")
+
     # "wet" vertex attribute: watered soil around the plants is darker and shinier
     wet = n.new("ShaderNodeAttribute", attribute_name="wet").outputs["Fac"]
-    hsv = n.new("ShaderNodeHueSaturation")
-    n.link(color, hsv.inputs["Color"])
-    n.link(n.math("MULTIPLY_ADD", wet, -0.55, 1.0), hsv.inputs["Value"])
-    height = n.math("MULTIPLY_ADD", clumps, 0.6, large)
-    n.bsdf(hsv.outputs["Color"], n.math("MULTIPLY_ADD", wet, -0.15, 0.93), height=height,
-           strength=0.45, distance=0.004)
+    color = n.mix(n.math("MULTIPLY", wet, n.math("SUBTRACT", 0.8, perlite)), color,
+                  n.mix(1.0, color, srgb(140, 128, 120), blend="MULTIPLY"))
+    rough = n.math("MULTIPLY_ADD", wet, -0.25, n.math("MULTIPLY_ADD", perlite, -0.2, 0.92))
+    height = n.math("MULTIPLY_ADD", perlite, 0.4,
+                    n.math("MULTIPLY_ADD", flake_mask, 0.2, crumbs))
+    n.bsdf(color, rough, height=height, strength=0.65, distance=0.004)
+    return mat
+
+
+def bark_material():
+    mat = get_material("Planter_Bark", srgb(96, 58, 36))
+    n = Nodes(mat)
+    uv = n.uv()
+    fibres = n.noise(n.scale(uv, (30.0, 300.0, 30.0)), 1.0, 4.0, 0.6).outputs["Fac"]
+    color = n.ramp(fibres, [(0.3, srgb(64, 36, 22)), (0.7, srgb(122, 76, 46))])
+    n.bsdf(color, 0.85, height=fibres, strength=0.5, distance=0.001)
     return mat
 
 
@@ -434,8 +512,8 @@ def stone_material():
     large = n.noise(uv, 30.0, 4.0, 0.6).outputs["Fac"]
     grit = n.noise(uv, 600.0, 2.0, 0.5).outputs["Fac"]
     value = n.math("MULTIPLY_ADD", large, 0.7, n.math("MULTIPLY", grit, 0.3))
-    color = n.ramp(value, [(0.3, srgb(70, 64, 58)), (0.55, srgb(112, 104, 94)),
-                           (0.8, srgb(150, 140, 126))])
+    color = n.ramp(value, [(0.3, srgb(58, 54, 48)), (0.55, srgb(90, 84, 76)),
+                           (0.8, srgb(122, 114, 102))])
     n.bsdf(color, 0.72, height=n.math("ADD", large, grit), strength=0.3,
            distance=0.001)
     return mat
@@ -466,6 +544,7 @@ def build_materials():
     return {
         "wood": wood_material(),
         "soil": soil_material(),
+        "bark": bark_material(),
         "liner": liner_material(),
         "stone": stone_material(),
         "metal": metal_material(),
@@ -587,10 +666,11 @@ def bed_bounds(d, side):
 
 
 def soil_height(d, x, y, cx, cy, seed):
-    """Soil surface: loose noise, a planting hole and a watering ring."""
+    """Soil surface: loose lumpy noise, a planting hole and a watering ring."""
     p = Vector((x * 9.0 + seed, y * 9.0 + seed * 1.7, 0.3))
-    h = noise.fractal(p, 0.6, 2.0, 4) * 0.004
-    h += noise.noise(Vector((x * 40.0 + seed, y * 40.0, 1.1))) * 0.0012
+    h = noise.fractal(p, 0.6, 2.0, 4) * 0.005
+    h += noise.noise(Vector((x * 22.0 + seed, y * 22.0, 1.1))) * 0.003
+    h += noise.noise(Vector((x * 45.0, y * 45.0 + seed, 2.3))) * 0.0015
     r = math.hypot(x - cx, y - cy)
     h -= 0.02 * math.exp(-((r - 0.075) / 0.032) ** 2)    # watering ring
     h += 0.008 * math.exp(-(r / 0.04) ** 2)              # root ball
@@ -621,8 +701,10 @@ def build_soil(bm, d, rng, seed):
     for side in (-1, 1):
         (x0, x1), (y0, y1), (nx, ny) = bed_bounds(d, side)
         cx, cy = (x0 + x1) / 2, 0.0
-        xs = axis_ticks(x0, x1, (-nx, nx), 0.012)
-        ys = axis_ticks(y0, y1, (-ny, ny), 0.012)
+        # ~1.2 cm grid, coarser on big boxes so the vertex budget holds
+        step = max(0.012, math.sqrt((x1 - x0) * (y1 - y0) / SOIL_VERTS))
+        xs = axis_ticks(x0, x1, (-nx, nx), step)
+        ys = axis_ticks(y0, y1, (-ny, ny), step)
         grid = {}
 
         def vert(i, j):
@@ -662,6 +744,57 @@ def label_spot(cx, cy):
     return cx + (0.11 if cx < 0 else -0.11), cy - 0.13
 
 
+def scatter(rng, slot, count, keep_out, margin=0.012):
+    """Random spots on one bed, away from the posts, the label and the
+    planting hole (keep_out = radius around the plant)."""
+    (x0, x1), (y0, y1), (nx, ny), (cx, cy) = slot
+    lx, ly = label_spot(cx, cy)
+    spots = []
+    for _ in range(count * 50):
+        if len(spots) == count:
+            break
+        x = rng.uniform(x0 + margin, x1 - margin)
+        y = rng.uniform(y0 + margin, y1 - margin)
+        if math.hypot(x - cx, y - cy) < keep_out:
+            continue
+        if abs(x) > nx - margin and abs(y) > ny - margin:
+            continue
+        if math.hypot(x - lx, y - ly) < 0.025:
+            continue
+        spots.append((x, y))
+    return spots
+
+
+def build_soil_bits(bm, d, rng, slots, seed, clods, chips):
+    """Loose soil clods (material 0) and bark chips (material 1)."""
+    for slot in slots:
+        cx, cy = slot[3]
+        for x, y in scatter(rng, slot, clods, 0.045):
+            size = rng.uniform(0.004, 0.014)
+            scale = Vector((size * rng.uniform(0.8, 1.4), size, size * rng.uniform(0.5, 0.8)))
+            z = soil_height(d, x, y, cx, cy, seed) + scale.z * 0.2
+            m = (Matrix.Translation((x, y, z))
+                 @ Matrix.Rotation(rng.uniform(0, math.tau), 4, "Z")
+                 @ Matrix.Diagonal(scale.to_4d()))
+            verts = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=1.0, matrix=m)["verts"]
+            jitter = Vector((rng.uniform(0, 100), 0, 0))
+            for v in verts:
+                local = v.co - Vector((x, y, z))
+                v.co += local * (noise.noise(local * 200.0 + jitter) * 0.3)
+            finish_faces(bm, list({f for v in verts for f in v.link_faces}), "X", 0, rng)
+        for x, y in scatter(rng, slot, chips, 0.06):
+            length, width = rng.uniform(0.008, 0.02), rng.uniform(0.004, 0.008)
+            outline = [(length * rng.uniform(0.8, 1.0), rng.uniform(-0.3, 0.3) * width),
+                       (rng.uniform(-0.2, 0.2) * length, width * rng.uniform(0.7, 1.0)),
+                       (-length * rng.uniform(0.8, 1.0), rng.uniform(-0.3, 0.3) * width),
+                       (rng.uniform(-0.2, 0.2) * length, -width * rng.uniform(0.7, 1.0))]
+            thick = rng.uniform(0.0015, 0.003)
+            m = (Matrix.Translation((x, y, soil_height(d, x, y, cx, cy, seed) - thick * 0.4))
+                 @ Matrix.Rotation(rng.uniform(0, math.tau), 4, "Z")
+                 @ Matrix.Rotation(rng.uniform(-0.25, 0.25), 4, "X"))
+            prism(bm, outline, 0.0, thick, "TOP", 1, rng, m)
+
+
 def build_pebbles(bm, d, rng, slots, seed, count):
     for (x0, x1), (y0, y1), (nx, ny), (cx, cy) in slots:
         placed = 0
@@ -691,7 +824,7 @@ def build_pebbles(bm, d, rng, slots, seed, count):
                 local = (v.co - Vector((x, y, z)))
                 v.co += local * (noise.noise(local * 160.0 + Vector((jitter, 0, 0))) * 0.35)
             faces = list({f for v in verts for f in v.link_faces})
-            finish_faces(bm, faces, "X", 0, rng)
+            finish_faces(bm, faces, "TOP", 0, rng)
             placed += 1
 
 
@@ -827,7 +960,9 @@ def build(params=None, location=None):
 
     bm = bmesh.new()
     slots = build_soil(bm, d, rng, seed)
-    make_object("Planter_Soil", bm, [mats["soil"]], coll, root, sharp_angle=60.0)
+    build_soil_bits(bm, d, rng, slots, seed, p["clods"], p["bark_chips"])
+    make_object("Planter_Soil", bm, [mats["soil"], mats["bark"]], coll, root,
+                sharp_angle=60.0)
 
     bm = bmesh.new()
     build_pebbles(bm, d, rng, slots, seed, p["pebbles"])

@@ -8,7 +8,8 @@ parts into one mesh, packs a second UV map without overlaps (hidden faces
 get less space), bakes the procedural materials into base colour, roughness,
 metallic, normal and ambient occlusion maps (Cycles) and writes
 planter_box.glb, planter_box.fbx and planter_box.obj plus the textures.
-The plant slot empties are exported as child nodes.
+The plant slot empties are exported as child nodes. The mesh has only
+triangles and quads and must stay under VERTEX_LIMIT (DayZ budget).
 """
 
 import os
@@ -21,6 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import planter_box  # noqa: E402
 
 NAME = "planter_box"
+VERTEX_LIMIT = 30000  # DayZ budget for the model, counted as the engine sees it
 PASSES = [  # (suffix, principled input or bake type, colour space)
     ("basecolor", "Base Color", "sRGB"),
     ("roughness", "Roughness", "Non-Color"),
@@ -54,15 +56,32 @@ def joined_mesh(root):
     return obj
 
 
-def drop_hidden_soil(obj):
-    """The soil skirt and floor sit behind the liner; skip them in the atlas."""
+def prepare_for_games(obj):
+    """Drop the soil skirt and floor (they sit behind the liner) and split
+    n-gons, since DayZ/Arma P3D models only take triangles and quads."""
     soil = obj.data.materials.find("Planter_Soil")
+    below = planter_box.Dims(planter_box.P).z_soil - 0.04  # under the surface
     bm = bmesh.new()
     bm.from_mesh(obj.data)
-    hidden = [f for f in bm.faces if f.material_index == soil and f.normal.z < 0.3]
+    hidden = [f for f in bm.faces if f.material_index == soil
+              and f.calc_center_median().z < below]
     bmesh.ops.delete(bm, geom=hidden, context="FACES")
+    bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 4])
     bm.to_mesh(obj.data)
     bm.free()
+
+
+def engine_vertex_count(me, uv_name):
+    """Vertices after splitting at UV seams and hard edges, which is what a
+    game engine (and the glTF file) ends up with."""
+    uv = me.uv_layers[uv_name].data
+    normals = me.corner_normals
+    keys = set()
+    for i, loop in enumerate(me.loops):
+        n, u = normals[i].vector, uv[i].uv
+        keys.add((loop.vertex_index, round(n.x, 4), round(n.y, 4), round(n.z, 4),
+                  round(u.x, 6), round(u.y, 6)))
+    return len(keys)
 
 
 def texel_weight(obj, poly, d):
@@ -220,9 +239,15 @@ def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     root = planter_box.build()
     obj = joined_mesh(root)
-    drop_hidden_soil(obj)
+    prepare_for_games(obj)
     density = pack_uvs(obj)
     print(f"texel density on visible wood: {density * size:.0f} px/m")
+    verts = engine_vertex_count(obj.data, "BakeUV")
+    print(f"vertices: {len(obj.data.vertices)} in Blender, {verts} in the engine "
+          f"(limit {VERTEX_LIMIT})")
+    if verts > VERTEX_LIMIT:
+        sys.exit(f"Too many vertices ({verts} > {VERTEX_LIMIT}); reduce the size or "
+                 "the pebble count in planter_box.py")
     images = bake(obj, size, out_dir)
 
     # swap to the baked material and keep only the packed UV map
@@ -257,7 +282,7 @@ def main():
                           path_mode="RELATIVE", export_triangulated_mesh=False)
 
     tris = sum(len(p.vertices) - 2 for p in me.polygons)
-    print(f"exported {NAME}: {len(me.polygons)} faces, ~{tris} triangles")
+    print(f"exported {NAME}: {verts} vertices, {len(me.polygons)} faces, {tris} triangles")
 
 
 main()
