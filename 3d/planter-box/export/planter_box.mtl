@@ -1,0 +1,14 @@
+# Blender 5.2.3 LTS MTL File: 'None'
+# www.blender.org
+
+newmtl Planter_Box_Baked
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/planter_box_basecolor.png
+map_Ns textures/planter_box_roughness.png
+map_refl textures/planter_box_metallic.png
+map_Bump -bm 1.000000 textures/planter_box_normal.png

@@ -17,7 +17,8 @@ mit gebackenen Texturen für Game-Engines.
 | Außenmaß (L × B × H) | 1,03 × 0,53 × 0,49 m (mit Griffen 1,06 m lang) |
 | Beete | 2 Stück, je ca. 46 × 43 cm, Erdtiefe ca. 34 cm (≈ 65 l Erde pro Pflanze) |
 | Pflanzstellen | Empties `PlantSlot_1` und `PlantSlot_2` in der Mitte jedes Beets |
-| Polygone | ca. 20 700 Dreiecke (Blender-Datei mit Bevels), Export ca. 19 800 Dreiecke |
+| Vertices | 20 899 im Export (so zählt die Engine), Limit 30 000 – siehe [DayZ](#dayz) |
+| Dreiecke | 21 080 im Export |
 | Ursprung | Am Boden, in der Mitte des Kastens (Empty `Planter_Box`) |
 
 **Enthaltene Details**
@@ -28,11 +29,12 @@ mit gebackenen Texturen für Game-Engines.
 - Außen eine Verstärkungsleiste in der Mitte, innen eine Trennwand für die zwei Beete
 - Bodenlatten auf Auflageleisten mit Spalten zum Ablaufen des Wassers
 - Schwarze Folie als Innenauskleidung
-- Erde mit Pflanzloch und Gießrand, frisch gegossene (dunklere) Stelle um die Pflanze,
-  Perlite-Körnchen und kleine Kieselsteine
+- Blumenerde mit Krümelstruktur und Rissen, trockenen und feuchten Stellen, Torffasern,
+  Rindenstückchen und Perlite; Pflanzloch mit Gießrand und frisch gegossener (dunklerer) Erde
+- Lose Erdklumpen, Rindenstücke und Kieselsteine als echte Geometrie
 - Verzinkte Griffe an beiden Stirnseiten, je ein Pflanzstecker pro Beet
-- Prozedurale Materialien: Holz mit echten Jahresringen (jedes Brett anders), Erde, Folie,
-  verzinkter Stahl, Gummi, Kunststoff
+- Prozedurale Materialien: dunkles, geöltes Holz mit echten Jahresringen (jedes Brett
+  anders), Erde, Rinde, Folie, verzinkter Stahl, Gummi, Kunststoff
 
 ## Dateien
 
@@ -41,7 +43,7 @@ mit gebackenen Texturen für Game-Engines.
 | `planter_box.blend` | Das Modell (Collection `Planter_Box`, als Asset markiert) |
 | `planter_box.py` | Generator-Skript: baut den Kasten, alle Maße einstellbar |
 | `export/planter_box.glb` | Ein Mesh, ein Material, Texturen eingebettet |
-| `export/planter_box.fbx`, `export/planter_box.obj` | Gleiches Mesh, Texturen in `export/textures/` |
+| `export/planter_box.fbx`, `export/planter_box.obj` | Gleiches Mesh; die Texturen liegen in `export/textures/` und werden relativ verknüpft (Ordner mitkopieren) |
 | `export/textures/` | 2048 × 2048: Basecolor, Roughness, Metallic, Normal (OpenGL), Ambient Occlusion |
 | `bake_export.py` | Erzeugt die Exporte und Texturen neu |
 | `render_preview.py` | Erzeugt die Vorschaubilder in `previews/` neu |
@@ -97,12 +99,30 @@ Oben in `planter_box.py` stehen alle Parameter im Block `P` (Werte in Metern):
 | `plank_h` | 0.14 | Brettbreite |
 | `clearance` | 0.04 | Bodenfreiheit |
 | `soil_drop` | 0.055 | Wie tief die Erde unter der Oberkante liegt |
-| `pebbles` | 14 | Kieselsteine pro Beet |
+| `pebbles` | 10 | Kieselsteine pro Beet |
+| `clods` / `bark_chips` | 40 / 12 | Erdklumpen und Rindenstücke pro Beet |
 | `seed` | 7 | Zufallswert für Maserung, Erde und Steine |
 
 Beispiel: `length = 1.4`, `rows = 4` ergibt einen langen, höheren Kasten; die zwei Beete und
 Pflanzstellen passen sich automatisch an. Danach das Skript ausführen (Variante B). Wenn du
 die Exporte für die neuen Maße brauchst, `bake_export.py` laufen lassen (siehe unten).
+
+## DayZ
+
+Für DayZ nimm die Dateien aus `export/` (FBX oder OBJ in Object Builder importieren):
+
+- **Vertices:** 20 899, gezählt wie in der Engine (Vertices an UV-Nähten und harten
+  Kanten mehrfach). `bake_export.py` bricht ab, wenn das Limit von 30 000 überschritten wird
+  (`VERTEX_LIMIT` oben im Skript). Auch eine sehr große Variante (2 × 1 m, 5 Bretter hoch)
+  bleibt mit rund 26 000 darunter, weil das Erdraster bei großen Kästen gröber wird.
+- **Nur Dreiecke und Vierecke:** N-Gons werden beim Export trianguliert, so wie P3D es verlangt.
+- **Ein Material, eine Textur-Garnitur:** Alles liegt auf einem 2048er-Atlas (eine Section).
+- **Texturen:** Mit den DayZ Tools (z. B. ImageToPAA) in `.paa` umwandeln: Basecolor als
+  `_co`, Normal Map als `_nohq`, Ambient Occlusion als `_as`. Die `_smdi`-Map aus Roughness
+  und Metallic stellst du nach der DayZ-Doku zusammen. Die Normal Map ist im OpenGL-Format
+  gebacken; wirkt sie in DayZ verkehrt herum, den grünen Kanal invertieren.
+- **Noch in Object Builder zu machen:** Geometry-LOD (Kollision), View-/Fire-Geometry und
+  die `.rvmat`. Die liefert dieses Paket nicht mit.
 
 ## Neu erzeugen (Kommandozeile)
 
@@ -131,5 +151,5 @@ blender --background --python render_preview.py -- --out previews
   EEVEE und Cycles; die Vorschaubilder sind mit Cycles gerendert. In andere Programme
   kommen die Materialien nur über die gebackenen Texturen im Ordner `export/`.
 - Teile in der `.blend`: `Planter_Wood` (Holz, mit Bevel-Modifier), `Planter_Liner`,
-  `Planter_Soil`, `Planter_Pebbles`, `Planter_Hardware` (Schrauben, Griffe, Füße),
-  `Planter_Labels`.
+  `Planter_Soil` (Erde, Klumpen, Rindenstücke), `Planter_Pebbles`, `Planter_Hardware`
+  (Schrauben, Griffe, Füße), `Planter_Labels`.
