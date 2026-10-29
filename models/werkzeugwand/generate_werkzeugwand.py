@@ -38,6 +38,12 @@ TIEFE = 0.025   # Wandabstand: Vorderseite bis Wand (abgekanteter Rand)
 BLECH = 0.002   # Blechstärke der Platte und des Rands
 LOCH = 0.010    # Lochdurchmesser 10 mm
 LOCH_SEGMENTE = 12  # Kanten je Loch (durch 4 teilbar; 8 = weniger Polygone)
+
+# Für DayZ wird weggelassen, was an der Wand hängend nie zu sehen ist. Mit True
+# entsteht ein geschlossenes Modell (rund 49 000 statt 17 000 Dreiecke).
+RUECKSEITE = False  # Rückseite des Blechs, Lochwände und Innenseite des Rands
+STIFTE = False      # Steckstifte, die hinter der Steckplatte im Loch stecken
+MAX_DREIECKE = 30000  # Warnung, wenn Platte + Haken mehr haben
 RASTER = 0.038  # Lochabstand 38 mm (Mitte zu Mitte)
 SPALTEN = 37    # ungerade, damit ein Loch genau auf X = 0 liegt
 REIHEN = 19     # ungerade, damit ein Loch genau auf Z = 0 liegt
@@ -258,7 +264,8 @@ def baue_platte():
     ecke_von = [round(((k + 0.5) * 360 / LOCH_SEGMENTE - 45) / 90) % 4 for k in range(LOCH_SEGMENTE)]
 
     # Vorder- und Rückseite: Randzellen als Viereck, Lochzellen als Ring aus Dreiecken
-    for y, xs, zs, n in ((yv, xv, zv, (0, -1, 0)), (yh, xh, zh, (0, 1, 0))):
+    seiten = [(yv, xv, zv, (0, -1, 0))] + ([(yh, xh, zh, (0, 1, 0))] if RUECKSEITE else [])
+    for y, xs, zs, n in seiten:
         for a in range(len(xs) - 1):
             for c in range(len(zs) - 1):
                 ecken = [(xs[a + 1], y, zs[c + 1]), (xs[a], y, zs[c + 1]),
@@ -275,7 +282,7 @@ def baue_platte():
                         m.flaeche([ecken[ecke_von[k - 1]], ecke, ring[k]], n)
 
     # Lochwände
-    for a in range(1, SPALTEN + 1):
+    for a in range(1, SPALTEN + 1) if RUECKSEITE else ():
         for c in range(1, REIHEN + 1):
             mx, mz = (xv[a] + xv[a + 1]) / 2, (zv[c] + zv[c + 1]) / 2
             for k in range(LOCH_SEGMENTE):
@@ -284,23 +291,25 @@ def baue_platte():
                            (mx + bx, yh, mz + bz), (mx + ax, yh, mz + az)],
                           (-(ax + bx), 0, -(az + bz)), smooth=True)
 
-    # Abgekanteter Rand: außen, innen und Stirnseite an der Wand (Y = 0)
+    # Abgekanteter Rand: außen, dazu mit RUECKSEITE innen und Stirnseite an der Wand (Y = 0)
     for a in range(len(xv) - 1):
         for s, zo, zi in ((1, h2, zh[-1]), (-1, -h2, zh[0])):
             m.flaeche([(xv[a], yv, zo), (xv[a + 1], yv, zo), (xv[a + 1], 0, zo), (xv[a], 0, zo)],
                       (0, 0, s))
-            m.flaeche([(xh[a], yh, zi), (xh[a + 1], yh, zi), (xh[a + 1], 0, zi), (xh[a], 0, zi)],
-                      (0, 0, -s))
-            m.flaeche([(xv[a], 0, zo), (xv[a + 1], 0, zo), (xh[a + 1], 0, zi), (xh[a], 0, zi)],
-                      (0, 1, 0))
+            if RUECKSEITE:
+                m.flaeche([(xh[a], yh, zi), (xh[a + 1], yh, zi), (xh[a + 1], 0, zi), (xh[a], 0, zi)],
+                          (0, 0, -s))
+                m.flaeche([(xv[a], 0, zo), (xv[a + 1], 0, zo), (xh[a + 1], 0, zi), (xh[a], 0, zi)],
+                          (0, 1, 0))
     for c in range(len(zv) - 1):
         for s, xo, xi in ((1, w2, xh[-1]), (-1, -w2, xh[0])):
             m.flaeche([(xo, yv, zv[c]), (xo, yv, zv[c + 1]), (xo, 0, zv[c + 1]), (xo, 0, zv[c])],
                       (s, 0, 0))
-            m.flaeche([(xi, yh, zh[c]), (xi, yh, zh[c + 1]), (xi, 0, zh[c + 1]), (xi, 0, zh[c])],
-                      (-s, 0, 0))
-            m.flaeche([(xo, 0, zv[c]), (xo, 0, zv[c + 1]), (xi, 0, zh[c + 1]), (xi, 0, zh[c])],
-                      (0, 1, 0))
+            if RUECKSEITE:
+                m.flaeche([(xi, yh, zh[c]), (xi, yh, zh[c + 1]), (xi, 0, zh[c + 1]), (xi, 0, zh[c])],
+                          (-s, 0, 0))
+                m.flaeche([(xo, 0, zv[c]), (xo, 0, zv[c + 1]), (xi, 0, zh[c + 1]), (xi, 0, zh[c])],
+                          (0, 1, 0))
     return m
 
 
@@ -312,7 +321,7 @@ def baue_haken(typ):
     """
     m = MeshBuilder(uv_skala=4.0)  # Hakentextur kachelt alle 25 cm
     spalten = 2 if typ == "doppel" else 1
-    for k in range(spalten):
+    for k in range(spalten) if STIFTE else ():
         x = k * RASTER
         # oberer Stift: durchs Loch, hinter dem Blech nach oben gebogen
         m.rohr(abrunden([(x, -0.0008, STIFT_Z), (x, BLECH + 0.0045, STIFT_Z),
@@ -570,6 +579,8 @@ def main(argv):
 
     gesamt = dreiecke(platte) + sum(dreiecke(h) for h in haken)
     print(f"Lochwand: {dreiecke(platte)} Dreiecke, {len(haken)} Haken, gesamt {gesamt} Dreiecke")
+    if gesamt > MAX_DREIECKE:
+        print(f"WARNUNG: mehr als {MAX_DREIECKE} Dreiecke")
     for typ in HAKEN_TYPEN:
         print(f"  Haken {typ}: {dreiecke(bpy.data.objects[f'Vorlage_Haken_{typ}'])} Dreiecke")
 

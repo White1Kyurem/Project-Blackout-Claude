@@ -11,10 +11,22 @@ Texturen für Blender und DayZ (`_co`, `_nohq`, `_smdi`, `.rvmat`) liegen in `te
 | --- | --- |
 | Größe | 150 cm breit × 80 cm hoch × 2,5 cm Wandabstand |
 | Lochung | rund Ø 10 mm, Raster 38 mm, 37 Spalten × 19 Reihen = 703 Löcher |
-| Blech | 2 mm, Rand rundum nach hinten abgekantet |
+| Blech | Vorderseite als Fläche, Rand rundum 2,5 cm nach hinten abgekantet |
 | Haken | 30 Stück, 5 Typen (siehe unten) |
-| Polygone | Platte 40 552 Dreiecke (12 Kanten je Loch), Haken 204–396 Dreiecke, alles zusammen 48 720 Dreiecke |
+| Polygone | **16 488 Dreiecke** gesamt: Platte 11 720 (12 Kanten je Loch), Haken 104–296 je Stück |
 | Einheit | 1 Einheit = 1 Meter |
+
+### Für DayZ optimiert
+
+Weggelassen ist nur, was man an der Wand hängend nie sieht:
+
+- Rückseite des Blechs, die Innenwände der Löcher und die Innenseite des Rands. Die Platte ist
+  also nach hinten offen und nur von vorne und von der Seite sichtbar.
+- Die Steckstifte der Haken, die hinter der Steckplatte im Loch stecken.
+
+Mit `RUECKSEITE = True` und `STIFTE = True` oben im Skript entsteht wieder das geschlossene Modell
+(rund 49 000 Dreiecke). Das Skript gibt beim Erzeugen die Dreieckszahl aus und warnt ab 30 000
+(`MAX_DREIECKE`). Jeder weitere Haken kostet 104–296 Dreiecke, es ist also noch Platz für viele.
 
 ## Dateien
 
@@ -25,7 +37,7 @@ Texturen für Blender und DayZ (`_co`, `_nohq`, `_smdi`, `.rvmat`) liegen in `te
 | `werkzeugwand.obj` / `.mtl` | Platte + alle Haken (OBJ kennt keine Empties) |
 | `einzelteile/lochwand_platte.*` | nur die Lochwand ohne Haken |
 | `einzelteile/haken_<typ>.*` | jeder Hakentyp einzeln, Ursprung am Einsteckpunkt |
-| `einzelteile/lochwand_kollision.*` | einfache Box (8 Punkte) für Geometry / View Geometry / Fire Geometry LOD |
+| `einzelteile/lochwand_kollision.*` | geschlossene Box (12 Dreiecke) für Geometry / View Geometry / Fire Geometry / Shadow LOD |
 | `texturen/` | alle Texturen und DayZ-Materialien (siehe unten) |
 | `proxy_positionen.csv` | Nummer, Typ, Loch und Koordinaten jedes Hakens und Proxys |
 | `vorschau/belegungsplan.jpg` | Ansicht von vorne mit Spalten-, Reihen- und Hakennummern |
@@ -49,8 +61,9 @@ nach dem Import verkehrt herum, einfach um 180° um die Hochachse drehen.
 
 ## Hakentypen
 
-Alle Haken haben eine Steckplatte mit zwei runden Stiften: der obere geht durchs Loch und ist
-hinter dem Blech nach oben gebogen, der untere steckt gerade im Loch darunter. Der Ursprung jedes Hakens ist die Mitte des
+Alle Haken haben eine Steckplatte, die das obere Loch und das Loch darunter abdeckt. Die
+Steckstifte dahinter sind unsichtbar und deshalb standardmäßig weggelassen (`STIFTE = True` baut
+sie mit: oben durchs Loch und hinter dem Blech hochgebogen, unten gerade eingesteckt). Der Ursprung jedes Hakens ist die Mitte des
 oberen Lochs auf der Vorderseite der Platte.
 
 | Typ | Beschreibung | Ausladung | Proxy-Empty sitzt … |
@@ -150,6 +163,7 @@ python generate_werkzeugwand.py --render
 ```
 
 Größe, Raster, Lochdurchmesser, Blechstärke, Drahtstärke und die Polygonzahl stehen als
-Konstanten oben im Skript. `LOCH_SEGMENTE = 8` statt 12 spart rund 11 000 Dreiecke an der Platte,
-`SEITEN` steuert die Kanten des Hakendrahts. Bei anderer Größe `SPALTEN` und `REIHEN` ungerade lassen, damit die
+Konstanten oben im Skript. `LOCH_SEGMENTE` ist die Kantenzahl je Loch: 16 = runder
+(+2 800 Dreiecke), 8 = sparsamer (−2 800 Dreiecke). `SEITEN` steuert die Kanten des
+Hakendrahts. Bei anderer Größe `SPALTEN` und `REIHEN` ungerade lassen, damit die
 Lochpositionen ganze Vielfache von 38 mm bleiben.
