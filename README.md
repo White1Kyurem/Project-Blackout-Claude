@@ -64,4 +64,10 @@ python3 -m http.server
 ## Hosting
 
 Any static host works: GitHub Pages, Netlify, Cloudflare Pages or regular web space. Upload
-all files as they are.
+all files as they are. The `3d/` folder is not part of the website and can be left out.
+
+## 3D assets
+
+`3d/planter-box/` holds a Blender model of a wooden planter box for two plants (procedural
+generator script, `.blend`, GLB/FBX/OBJ with baked textures). See its
+[README](3d/planter-box/README.md).
