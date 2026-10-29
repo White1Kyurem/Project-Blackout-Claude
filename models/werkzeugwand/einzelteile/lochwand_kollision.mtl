@@ -2,11 +2,13 @@
 # www.blender.org
 
 newmtl Lochwand_Platte
-Ns 302.500000
 Ka 1.000000 1.000000 1.000000
-Kd 0.125000 0.205000 0.305000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
+map_Kd ../texturen/lochwand_platte_co.png
+map_Ns ../texturen/lochwand_platte_rough.png
+map_refl ../texturen/lochwand_platte_metal.png
+map_Bump -bm 1.000000 ../texturen/lochwand_platte_normal.png

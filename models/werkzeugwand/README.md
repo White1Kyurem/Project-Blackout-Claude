@@ -2,32 +2,35 @@
 
 3D-Modell einer Werkzeug-Lochwand mit Haken, die nach vorne aus der Wand stehen. An jedem
 Haken sitzt ein Empty als Markierung für einen Proxy (z. B. Werkzeug, das am Haken hängt).
-Die Löcher sind echte Geometrie, also kann man überall weitere Haken einsetzen.
+Die runden Löcher sind echte Geometrie, also kann man überall weitere Haken einsetzen.
+Texturen für Blender und DayZ (`_co`, `_nohq`, `_smdi`, `.rvmat`) liegen in `texturen/`.
 
 ![Vorschau](vorschau/vorschau_gesamt.jpg)
 
 | | |
 | --- | --- |
 | Größe | 150 cm breit × 80 cm hoch × 2,5 cm Wandabstand |
-| Lochung | Vierkant 10 × 10 mm, Raster 38 mm, 37 Spalten × 19 Reihen = 703 Löcher |
+| Lochung | rund Ø 10 mm, Raster 38 mm, 37 Spalten × 19 Reihen = 703 Löcher |
 | Blech | 2 mm, Rand rundum nach hinten abgekantet |
 | Haken | 30 Stück, 5 Typen (siehe unten) |
-| Polygone | Platte 15 880 Dreiecke, Haken 140–332 Dreiecke, alles zusammen 21 872 Dreiecke |
+| Polygone | Platte 40 552 Dreiecke (12 Kanten je Loch), Haken 204–396 Dreiecke, alles zusammen 48 720 Dreiecke |
 | Einheit | 1 Einheit = 1 Meter |
 
 ## Dateien
 
 | Datei | Inhalt |
 | --- | --- |
-| `werkzeugwand.blend` | Blender-Szene: Platte, Haken, Proxy-Empties, Vorlagen und Kollisionsbox |
+| `werkzeugwand.blend` | Blender-Szene: Platte, Haken, Proxy-Empties, Vorlagen und Kollisionsbox, Materialien mit Texturen |
 | `werkzeugwand.fbx` | Platte + alle Haken + Proxy-Empties |
 | `werkzeugwand.obj` / `.mtl` | Platte + alle Haken (OBJ kennt keine Empties) |
 | `einzelteile/lochwand_platte.*` | nur die Lochwand ohne Haken |
 | `einzelteile/haken_<typ>.*` | jeder Hakentyp einzeln, Ursprung am Einsteckpunkt |
 | `einzelteile/lochwand_kollision.*` | einfache Box (8 Punkte) für Geometry / View Geometry / Fire Geometry LOD |
+| `texturen/` | alle Texturen und DayZ-Materialien (siehe unten) |
 | `proxy_positionen.csv` | Nummer, Typ, Loch und Koordinaten jedes Hakens und Proxys |
 | `vorschau/belegungsplan.jpg` | Ansicht von vorne mit Spalten-, Reihen- und Hakennummern |
 | `generate_werkzeugwand.py` | Skript, das alles oben erzeugt (Maße und Hakenbelegung stehen oben drin) |
+| `texturen.py` | erzeugt die Texturen |
 | `vorschau.py` | rendert die Vorschaubilder |
 
 ## Achsen und Ursprung
@@ -46,8 +49,8 @@ nach dem Import verkehrt herum, einfach um 180° um die Hochachse drehen.
 
 ## Hakentypen
 
-Alle Haken haben eine Steckplatte mit zwei Laschen: oben eingehängt (hinter dem Blech nach unten
-abgekantet), unten eingesteckt im Loch darunter. Der Ursprung jedes Hakens ist die Mitte des
+Alle Haken haben eine Steckplatte mit zwei runden Stiften: der obere geht durchs Loch und ist
+hinter dem Blech nach oben gebogen, der untere steckt gerade im Loch darunter. Der Ursprung jedes Hakens ist die Mitte des
 oberen Lochs auf der Vorderseite der Platte.
 
 | Typ | Beschreibung | Ausladung | Proxy-Empty sitzt … |
@@ -66,8 +69,38 @@ oberen Lochs auf der Vorderseite der Platte.
   `proxy_objfbx_*` für die exportierten FBX-/OBJ-Dateien (und damit für Object Builder). Welcher
   Haken welche Nummer hat, zeigt `vorschau/belegungsplan.jpg`.
 - Die Hakenmeshes heißen `Haken_<Nr>_<Typ>`, das Material der Platte `Lochwand_Platte` und das
-  der Haken `Lochwand_Haken`. Dort kommen die eigenen Texturen bzw. rvmats drauf.
-- UVs: Box-Projektion, 1 UV-Einheit = 1 m, passend für kachelnde Metall-/Lacktexturen.
+  der Haken `Lochwand_Haken`.
+
+## Texturen
+
+Alle Texturen sind kachelbar und werden von `texturen.py` erzeugt. Die Platte ist taubenblau
+lackiert mit leichten Kratzern und Schmutz, die Haken sind verzinkt.
+
+| Datei | Verwendung |
+| --- | --- |
+| `<name>_co.png` | Farbe – Blender und DayZ |
+| `<name>_nohq.png` | Normal Map für DayZ (DirectX-Format, Grün invertiert) |
+| `<name>_smdi.png` | DayZ: Rot = 1, Grün = Glanzstärke, Blau = Glanzschärfe |
+| `<name>_normal.png` | Normal Map für Blender (OpenGL-Format) |
+| `<name>_rough.png`, `<name>_metal.png` | Rauheit und Metallic für Blender |
+| `<name>.rvmat` | DayZ-Material (Super-Shader), verweist auf `_nohq.paa` und `_smdi.paa` |
+
+`<name>` ist `lochwand_platte` (1024 px = 1 m) oder `lochwand_haken` (512 px = 25 cm). Die UVs
+sind per Box-Projektion so skaliert: Platte 1 UV-Einheit = 1 m, Haken 1 UV-Einheit = 25 cm.
+
+In Blender sind die Texturen schon an die Materialien angeschlossen (relative Pfade, den Ordner
+`texturen/` also neben der `.blend` lassen). FBX und OBJ verweisen ebenfalls relativ darauf.
+
+Für DayZ:
+
+1. Die `_co`-, `_nohq`- und `_smdi`-PNGs mit ImageToPAA (DayZ Tools) in `.paa` umwandeln.
+2. In beiden `.rvmat`-Dateien den Pfad `MeinMod\werkzeugwand\data` auf den eigenen Mod-Pfad
+   ändern (oder `DAYZ_PFAD` in `texturen.py` setzen und neu erzeugen).
+3. In Object Builder den Flächen der Platte `lochwand_platte_co.paa` als Textur und
+   `lochwand_platte.rvmat` als Material zuweisen, den Haken entsprechend die `lochwand_haken`-Dateien.
+
+Wirkt die Beleuchtung der Oberfläche im Spiel verkehrt herum (Kratzer stehen hervor statt
+vertieft), ist das Normal-Format vertauscht: dann `_normal.png` statt `_nohq.png` umwandeln.
 
 ## Weitere Haken einsetzen
 
@@ -116,6 +149,7 @@ Python-Version):
 python generate_werkzeugwand.py --render
 ```
 
-Größe, Raster, Blechstärke, Drahtstärke und Polygonzahl der Haken (`SEITEN`) stehen als
-Konstanten oben im Skript. Bei anderer Größe `SPALTEN` und `REIHEN` ungerade lassen, damit die
+Größe, Raster, Lochdurchmesser, Blechstärke, Drahtstärke und die Polygonzahl stehen als
+Konstanten oben im Skript. `LOCH_SEGMENTE = 8` statt 12 spart rund 11 000 Dreiecke an der Platte,
+`SEITEN` steuert die Kanten des Hakendrahts. Bei anderer Größe `SPALTEN` und `REIHEN` ungerade lassen, damit die
 Lochpositionen ganze Vielfache von 38 mm bleiben.

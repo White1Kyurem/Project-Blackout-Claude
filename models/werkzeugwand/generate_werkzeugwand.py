@@ -1,8 +1,8 @@
 """Werkzeugwand (Lochwand) 150 x 80 cm mit Haken – Generator für Blender.
 
-Baut eine Lochwand mit Vierkantlochung 10 x 10 mm im 38-mm-Raster und steckt
-Haken hinein, die nach vorne aus der Wand stehen. Jeder Haken bekommt ein Empty
-als Markierung für einen Proxy. Danach werden .blend, FBX, OBJ und eine
+Baut eine Lochwand mit Rundlochung Ø 10 mm im 38-mm-Raster und steckt Haken
+hinein, die nach vorne aus der Wand stehen. Jeder Haken bekommt ein Empty als
+Markierung für einen Proxy. Danach werden Texturen, .blend, FBX, OBJ und eine
 Positionsliste (CSV) geschrieben.
 
 Ausführen (Blender 4.2 oder neuer):
@@ -26,6 +26,9 @@ import sys
 import bpy
 from mathutils import Vector
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import texturen  # noqa: E402
+
 # --------------------------------------------------------------------------
 # Maße (Meter)
 # --------------------------------------------------------------------------
@@ -33,12 +36,15 @@ BREITE = 1.50   # Breite der Wand
 HOEHE = 0.80    # Höhe der Wand
 TIEFE = 0.025   # Wandabstand: Vorderseite bis Wand (abgekanteter Rand)
 BLECH = 0.002   # Blechstärke der Platte und des Rands
-LOCH = 0.010    # Vierkantloch 10 x 10 mm
+LOCH = 0.010    # Lochdurchmesser 10 mm
+LOCH_SEGMENTE = 12  # Kanten je Loch (durch 4 teilbar; 8 = weniger Polygone)
 RASTER = 0.038  # Lochabstand 38 mm (Mitte zu Mitte)
 SPALTEN = 37    # ungerade, damit ein Loch genau auf X = 0 liegt
 REIHEN = 19     # ungerade, damit ein Loch genau auf Z = 0 liegt
 
 DRAHT_R = 0.003     # Hakendraht Ø 6 mm
+STIFT_R = 0.0024    # Steckstifte Ø 4,8 mm
+STIFT_Z = -LOCH / 2 + STIFT_R + 0.0003  # Stifte liegen unten im Loch auf
 SEITEN = 8          # Kanten des Drahtquerschnitts (Polygonzahl)
 ARM_Z = -0.026      # Höhe, an der der Arm an der Steckplatte sitzt (lokal)
 
@@ -83,7 +89,8 @@ def loch_z(reihe):
 class MeshBuilder:
     """Sammelt Flächen; gleiche Positionen innerhalb eines Teils teilen sich einen Vertex."""
 
-    def __init__(self):
+    def __init__(self, uv_skala=1.0):
+        self.uv_skala = uv_skala
         self.verts = []
         self.faces = []
         self.uvs = []
@@ -180,7 +187,7 @@ class MeshBuilder:
         me = bpy.data.meshes.new(name)
         me.from_pydata(self.verts, [], self.faces)
         uv_layer = me.uv_layers.new(name="UVMap")
-        loop_uvs = [c for face in self.uvs for uv in face for c in uv]
+        loop_uvs = [c * self.uv_skala for face in self.uvs for uv in face for c in uv]
         uv_layer.data.foreach_set("uv", loop_uvs)
         me.polygons.foreach_set("use_smooth", self.smooth)
         # Kanten zwischen glatten und flachen Flächen hart machen
@@ -234,40 +241,48 @@ def abrunden(punkte, radius, max_schritt=math.radians(22.5)):
 
 
 def baue_platte():
-    """Lochblech mit umlaufend nach hinten abgekantetem Rand."""
+    """Lochblech mit Rundlöchern und umlaufend nach hinten abgekantetem Rand."""
+    if LOCH_SEGMENTE % 4:
+        raise ValueError("LOCH_SEGMENTE muss durch 4 teilbar sein")
     m = MeshBuilder()
     w2, h2 = BREITE / 2, HOEHE / 2
     yv, yh = -TIEFE, -TIEFE + BLECH  # Vorderseite, Rückseite des Blechs
-    lx = [loch_x(s) for s in range(1, SPALTEN + 1)]
-    lz = sorted(loch_z(r) for r in range(1, REIHEN + 1))
+    # Jedes Loch sitzt mittig in einer eigenen Rasterzelle (RASTER x RASTER)
+    gx = [loch_x(1) - RASTER / 2 + k * RASTER for k in range(SPALTEN + 1)]
+    gz = [loch_z(REIHEN) - RASTER / 2 + k * RASTER for k in range(REIHEN + 1)]
+    xv, zv = [-w2, *gx, w2], [-h2, *gz, h2]
+    xh, zh = [-w2 + BLECH, *gx, w2 - BLECH], [-h2 + BLECH, *gz, h2 - BLECH]
+    kreis = [(LOCH / 2 * math.cos(2 * math.pi * k / LOCH_SEGMENTE),
+              LOCH / 2 * math.sin(2 * math.pi * k / LOCH_SEGMENTE)) for k in range(LOCH_SEGMENTE)]
+    # Zellecke (45°, 135°, 225°, 315°), die jeder Kreiskante am nächsten liegt
+    ecke_von = [round(((k + 0.5) * 360 / LOCH_SEGMENTE - 45) / 90) % 4 for k in range(LOCH_SEGMENTE)]
 
-    def teilung(lo, hi, mitten):
-        out = [lo]
-        for c in mitten:
-            out += [c - LOCH / 2, c + LOCH / 2]
-        return out + [hi]
-
-    xv, zv = teilung(-w2, w2, lx), teilung(-h2, h2, lz)
-    xh, zh = teilung(-w2 + BLECH, w2 - BLECH, lx), teilung(-h2 + BLECH, h2 - BLECH, lz)
-
-    # Vorder- und Rückseite des Blechs, Löcher ausgespart
-    for a in range(len(xv) - 1):
-        for c in range(len(zv) - 1):
-            if a % 2 and c % 2:
-                continue
-            m.flaeche([(xv[a], yv, zv[c]), (xv[a + 1], yv, zv[c]),
-                       (xv[a + 1], yv, zv[c + 1]), (xv[a], yv, zv[c + 1])], (0, -1, 0))
-            m.flaeche([(xh[a], yh, zh[c]), (xh[a + 1], yh, zh[c]),
-                       (xh[a + 1], yh, zh[c + 1]), (xh[a], yh, zh[c + 1])], (0, 1, 0))
+    # Vorder- und Rückseite: Randzellen als Viereck, Lochzellen als Ring aus Dreiecken
+    for y, xs, zs, n in ((yv, xv, zv, (0, -1, 0)), (yh, xh, zh, (0, 1, 0))):
+        for a in range(len(xs) - 1):
+            for c in range(len(zs) - 1):
+                ecken = [(xs[a + 1], y, zs[c + 1]), (xs[a], y, zs[c + 1]),
+                         (xs[a], y, zs[c]), (xs[a + 1], y, zs[c])]
+                if not (0 < a < len(xs) - 2 and 0 < c < len(zs) - 2):
+                    m.flaeche(ecken, n)
+                    continue
+                mx, mz = (xs[a] + xs[a + 1]) / 2, (zs[c] + zs[c + 1]) / 2
+                ring = [(mx + kx, y, mz + kz) for kx, kz in kreis]
+                for k in range(LOCH_SEGMENTE):
+                    ecke = ecken[ecke_von[k]]
+                    m.flaeche([ecke, ring[k], ring[(k + 1) % LOCH_SEGMENTE]], n)
+                    if ecke_von[k - 1] != ecke_von[k]:
+                        m.flaeche([ecken[ecke_von[k - 1]], ecke, ring[k]], n)
 
     # Lochwände
-    for x in lx:
-        for z in lz:
-            x0, x1, z0, z1 = x - LOCH / 2, x + LOCH / 2, z - LOCH / 2, z + LOCH / 2
-            m.flaeche([(x0, yv, z0), (x1, yv, z0), (x1, yh, z0), (x0, yh, z0)], (0, 0, 1))
-            m.flaeche([(x0, yv, z1), (x1, yv, z1), (x1, yh, z1), (x0, yh, z1)], (0, 0, -1))
-            m.flaeche([(x0, yv, z0), (x0, yv, z1), (x0, yh, z1), (x0, yh, z0)], (1, 0, 0))
-            m.flaeche([(x1, yv, z0), (x1, yv, z1), (x1, yh, z1), (x1, yh, z0)], (-1, 0, 0))
+    for a in range(1, SPALTEN + 1):
+        for c in range(1, REIHEN + 1):
+            mx, mz = (xv[a] + xv[a + 1]) / 2, (zv[c] + zv[c + 1]) / 2
+            for k in range(LOCH_SEGMENTE):
+                (ax, az), (bx, bz) = kreis[k], kreis[(k + 1) % LOCH_SEGMENTE]
+                m.flaeche([(mx + ax, yv, mz + az), (mx + bx, yv, mz + bz),
+                           (mx + bx, yh, mz + bz), (mx + ax, yh, mz + az)],
+                          (-(ax + bx), 0, -(az + bz)), smooth=True)
 
     # Abgekanteter Rand: außen, innen und Stirnseite an der Wand (Y = 0)
     for a in range(len(xv) - 1):
@@ -295,14 +310,16 @@ def baue_haken(typ):
     -Y zeigt aus der Wand heraus, das Blech liegt bei 0 <= y <= BLECH.
     Gibt den MeshBuilder und die lokale Proxy-Position zurück.
     """
-    m = MeshBuilder()
+    m = MeshBuilder(uv_skala=4.0)  # Hakentextur kachelt alle 25 cm
     spalten = 2 if typ == "doppel" else 1
     for k in range(spalten):
         x = k * RASTER
-        m.quader(x - 0.004, x + 0.004, -0.0005, BLECH + 0.003, -0.0048, -0.0033)   # obere Lasche
-        m.quader(x - 0.004, x + 0.004, BLECH + 0.0015, BLECH + 0.003, -0.016, -0.0033)  # abgekantet
-        m.quader(x - 0.004, x + 0.004, -0.0005, BLECH + 0.004,
-                 -RASTER - 0.0048, -RASTER - 0.0033)  # untere Lasche
+        # oberer Stift: durchs Loch, hinter dem Blech nach oben gebogen
+        m.rohr(abrunden([(x, -0.0008, STIFT_Z), (x, BLECH + 0.0045, STIFT_Z),
+                         (x, BLECH + 0.0045, STIFT_Z + 0.012)], 0.003), STIFT_R, seiten=6)
+        # unterer Stift: gerade ins Loch darunter
+        m.rohr([(x, -0.0008, STIFT_Z - RASTER), (x, BLECH + 0.005, STIFT_Z - RASTER)],
+               STIFT_R, seiten=6)
     m.quader(-0.008, (spalten - 1) * RASTER + 0.008, -0.0017, -0.0002, -RASTER - 0.009, 0.009)
 
     steigung = math.tan(math.radians(8))
@@ -343,18 +360,31 @@ def baue_kollision():
 # --------------------------------------------------------------------------
 # Szene
 # --------------------------------------------------------------------------
-def material(name, farbe, metallic, rauheit):
+def material(name, farbe, metallic, rauheit, maps):
+    """Principled-BSDF-Material mit Farb-, Rauheits-, Metall- und Normal-Textur."""
     mat = bpy.data.materials.new(name)
     mat.diffuse_color = farbe
     mat.metallic = metallic
     mat.roughness = rauheit
     if mat.node_tree is None and hasattr(mat, "use_nodes"):
         mat.use_nodes = True
-    bsdf = mat.node_tree.nodes.get("Principled BSDF")
-    if bsdf:
-        bsdf.inputs["Base Color"].default_value = farbe
-        bsdf.inputs["Metallic"].default_value = metallic
-        bsdf.inputs["Roughness"].default_value = rauheit
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    bsdf = nodes["Principled BSDF"]
+
+    def bild(kanal, farbraum, y):
+        node = nodes.new("ShaderNodeTexImage")
+        node.image = bpy.data.images.load(maps[kanal], check_existing=True)
+        node.image.colorspace_settings.name = farbraum
+        node.location = (-700, y)
+        return node
+
+    links.new(bild("co", 'sRGB', 300).outputs["Color"], bsdf.inputs["Base Color"])
+    links.new(bild("rough", 'Non-Color', 0).outputs["Color"], bsdf.inputs["Roughness"])
+    links.new(bild("metal", 'Non-Color', -300).outputs["Color"], bsdf.inputs["Metallic"])
+    normal_map = nodes.new("ShaderNodeNormalMap")
+    normal_map.location = (-300, -600)
+    links.new(bild("normal", 'Non-Color', -600).outputs["Color"], normal_map.inputs["Color"])
+    links.new(normal_map.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 
 
@@ -404,15 +434,16 @@ def pruefe_abstaende(objekte):
                 raise ValueError(f"{a[0]} und {b[0]} überschneiden sich")
 
 
-def baue_szene():
+def baue_szene(out):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     szene = bpy.context.scene
     szene.unit_settings.system = 'METRIC'
     szene.unit_settings.scale_length = 1.0
     szene.unit_settings.length_unit = 'CENTIMETERS'
 
-    mat_platte = material("Lochwand_Platte", FARBE_PLATTE, 0.0, 0.45)
-    mat_haken = material("Lochwand_Haken", FARBE_HAKEN, 1.0, 0.32)
+    maps = texturen.erzeuge(os.path.join(out, "texturen"))
+    mat_platte = material("Lochwand_Platte", FARBE_PLATTE, 0.0, 0.45, maps["lochwand_platte"])
+    mat_haken = material("Lochwand_Haken", FARBE_HAKEN, 1.0, 0.32, maps["lochwand_haken"])
 
     col_wand = collection("Werkzeugwand")
     col_vorlagen = collection("Haken_Vorlagen")
@@ -473,12 +504,12 @@ def exportiere(pfad, objekte, mit_empties=False):
             object_types={'MESH', 'EMPTY'} if mit_empties else {'MESH'},
             apply_scale_options='FBX_SCALE_UNITS', mesh_smooth_type='FACE',
             axis_forward='-Z', axis_up='Y', add_leaf_bones=False, bake_anim=False,
-            use_custom_props=True)
+            use_custom_props=True, path_mode='RELATIVE')
     else:
         bpy.ops.wm.obj_export(
             filepath=pfad, export_selected_objects=True, forward_axis='NEGATIVE_Z', up_axis='Y',
             export_uv=True, export_normals=True, export_materials=True,
-            export_smooth_groups=True, export_triangulated_mesh=False, path_mode='STRIP')
+            export_smooth_groups=True, export_triangulated_mesh=False, path_mode='RELATIVE')
 
 
 def dreiecke(obj):
@@ -510,7 +541,7 @@ def main(argv):
     teile = os.path.join(out, "einzelteile")
     os.makedirs(teile, exist_ok=True)
 
-    platte, haken, kollision, zeilen = baue_szene()
+    platte, haken, kollision, zeilen = baue_szene(out)
 
     empties = [c for h in haken for c in h.children]
     for endung in ("fbx", "obj"):
@@ -554,5 +585,4 @@ if __name__ == "__main__":
         argv = sys.argv[1:]
     else:
         argv = []
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     main(argv)

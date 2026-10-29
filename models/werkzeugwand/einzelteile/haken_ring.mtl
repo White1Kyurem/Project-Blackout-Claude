@@ -2,11 +2,13 @@
 # www.blender.org
 
 newmtl Lochwand_Haken
-Ns 462.399994
 Ka 1.000000 1.000000 1.000000
-Kd 0.750000 0.760000 0.780000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
-illum 3
+illum 2
+map_Kd ../texturen/lochwand_haken_co.png
+map_Ns ../texturen/lochwand_haken_rough.png
+map_refl ../texturen/lochwand_haken_metal.png
+map_Bump -bm 1.000000 ../texturen/lochwand_haken_normal.png
